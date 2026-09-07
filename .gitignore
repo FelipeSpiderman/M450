@@ -1,0 +1,13 @@
+# Compiled class files
+*.class
+classes/
+
+# IDE
+.idea/
+*.iml
+
+# Maven build output
+target/
+
+# macOS
+.DS_Store
