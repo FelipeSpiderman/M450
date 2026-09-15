@@ -76,7 +76,7 @@ Die Applikation ist eine Konsolenanwendung, die ein Bankmenü anbietet. Folgende
 | B10 | Überweisung ("ü") auf ein anderes Konto mit genügend Guthaben | Betrag wird vom einen aufs andere Konto verschoben | | offen |
 | B11 | Überweisung auf das gleiche Konto | Fehlermeldung "Bitte ein anderes Konto auswählen" erscheint | | offen |
 | B12 | Überweisung auf ein nicht vorhandenes Konto | Fehlermeldung, dass dieses Konto nicht existiert | | offen |
-| B13 | Überweisung zwischen Konten mit unterschiedlichen Währungen (z. B. CHF nach EUR) | Der Betrag wird mit dem hinterlegten Wechselkurs umgerechnet | | offen |
+| B13 | Überweisung zwischen Konten mit unterschiedlichen Währungen (z. B. USD nach CHF) | Der Betrag wird mit dem hinterlegten Wechselkurs umgerechnet (nur USD→CHF, USD→EUR, CHF→USD; andere Kombinationen werden nicht umgerechnet) | | offen |
 | B14 | Option "w" (Wechselkurs) mit der Eingabe "CHF USD" | Der aktuelle Wechselkurs wird angezeigt | | offen |
 | B15 | Option "l" (Konto löschen) mit Bestätigung "j" | Konto wird aus der Liste entfernt und eine Bestätigung ausgegeben | | offen |
 | B16 | Ungültige Eingabe im Hauptmenü (z. B. "x") | Fehlermeldung erscheint und das Menü wird erneut angezeigt | | offen |

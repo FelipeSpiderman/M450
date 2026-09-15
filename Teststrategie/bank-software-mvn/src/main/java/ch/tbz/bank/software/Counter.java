@@ -1,4 +1,4 @@
-package ch.tbz.bank.software;
+package main.java.ch.tbz.bank.software;
 
 import java.util.Scanner;
 import java.util.regex.Matcher;

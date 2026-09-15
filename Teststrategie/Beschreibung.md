@@ -93,8 +93,8 @@ Die Bank-Software herunterladen, lokal zum Laufen bringen, sich den Code ansehen
 ### Wie startet man die Anwendung?
 
 Es gibt zwei Varianten:
-- **Variante A (empfohlen):** Im Terminal `cd Teststrategie/bank-software`, dann `javac` zum Kompilieren und `java` zum Starten. Die Anleitung steht in `Teststrategie/Anleitung.md`.
-- **Variante B:** Den Maven-Ordner `Teststrategie/bank-software-mvn/` in IntelliJ öffnen und den `Main`-Class starten.
+- **Variante A (empfohlen):** Den Maven-Ordner `Teststrategie/bank-software-mvn/` in IntelliJ öffnen und den `Main`-Class starten. Die Anleitung steht in `Teststrategie/Anleitung.md`.
+- **Variante B:** Im Terminal `cd Teststrategie/bank-software-mvn`, dann `mvn compile` zum Kompilieren und `java -cp target/classes main.java.ch.tbz.bank.software.Main` zum Starten.
 
 ### Black-Box-Testfälle (17 Stück)
 
@@ -128,7 +128,7 @@ Da der Code sichtbar ist, kann man gezielt Pfade durch den Code testen. Wichtige
 - **Account.deposit()** ist kritisch, weil negative Beträge nicht abgefangen werden.
 - **Bank.getAccount()** gibt `null` zurück, wenn das Konto nicht existiert – das muss man testen.
 - **Counter.convertCurrency()** hat für jede Währungskombination einen eigenen Code-Pfad plus einen Fall ohne Umrechnung.
-- **Counter.transferAmount()** kombiniert Abhebung, Währungsumrechnung und Einzahlung – ein集成ierter Testfall.
+- **Counter.transferAmount()** kombiniert Abhebung, Währungsumrechnung und Einzahlung – ein integrierter Testfall.
 - **Counter.createAccount()** validiert die Währungsabkürzung mit Regex und fängt unbekannte Währungen mit Fallback auf USD ab.
 - **ExchangeRateOkhttp.getExchangeRate()** liefert bei Erfolg den Kurs, bei Fehler 0.0.
 
