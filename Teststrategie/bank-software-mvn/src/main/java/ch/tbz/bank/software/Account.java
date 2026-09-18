@@ -1,4 +1,4 @@
-package main.java.ch.tbz.bank.software;
+package ch.tbz.bank.software;
 
 /*
 3	Bank Simulation with Account class (Competence O2)

@@ -1,4 +1,4 @@
-package main.java.ch.tbz.bank.software;
+package ch.tbz.bank.software;
 
 import java.util.ArrayList;
 public class Bank {

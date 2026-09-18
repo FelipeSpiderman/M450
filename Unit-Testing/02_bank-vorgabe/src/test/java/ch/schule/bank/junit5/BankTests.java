@@ -57,6 +57,9 @@ public class BankTests {
     public void testDepositUnbekanntesKonto() {
         Bank bank = new Bank();
         assertFalse(bank.deposit("S-9999", 13576, 12000));
+        // Branch coverage: amount < 0
+        bank.createSavingsAccount();
+        assertFalse(bank.deposit("S-1000", 13576, -100));
     }
 
     /**
@@ -69,6 +72,10 @@ public class BankTests {
         bank.deposit("S-1000", 13576, 12000);
         assertTrue(bank.withdraw("S-1000", 13577, 2000));
         assertEquals(10000, bank.getBalance("S-1000"));
+        // Branch coverage: amount < 0
+        assertFalse(bank.withdraw("S-1000", 13578, -100));
+        // Branch coverage: account not found
+        assertFalse(bank.withdraw("S-9999", 13578, 100));
     }
 
     /**
@@ -162,5 +169,16 @@ public class BankTests {
         bank.deposit("S-1001", 13576, 12000);
         bank.deposit("S-1002", 13576, 8000);
         bank.printBottom5();
+    }
+
+    /**
+     * Testet Getter und Setter für das Konto (UML-Kompatibilität).
+     */
+    @Test
+    public void testGetSetAccount() {
+        Bank bank = new Bank();
+        ch.schule.SavingsAccount account = new ch.schule.SavingsAccount("S-1000");
+        bank.setAccount(account);
+        assertEquals(account, bank.getAccount());
     }
 }

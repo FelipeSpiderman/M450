@@ -7,12 +7,23 @@ package ch.schule.bank.junit5;
 
 
 import ch.schule.Bank;
+import ch.schule.BankUtils;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author       Luigi Cavuoti
  * @uml.dependency  supplier="ch.schule.m326.bank.Bank"
  */
 public class TestBank {
+
+    @Test
+    public void testBankUtils() {
+        assertNotNull(BankUtils.formatBankDate(13576));
+        assertNotNull(BankUtils.formatAmount(12000));
+        // Coverage for private constructor
+        new BankUtils();
+    }
 
     public static void main(String[] args)
     {

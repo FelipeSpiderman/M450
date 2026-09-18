@@ -121,5 +121,24 @@ public class AccountTests {
         konto.deposit(13576, 12000);
         konto.withdraw(13577, 5000);
         konto.print(2008, 1);
+        // Test loop termination and branches
+        konto.deposit(13576 + 60, 1000);
+        konto.print(2008, 1);
+        // Branch coverage: date < startDate
+        konto.print(2008, 2);
+        // Branch coverage: date >= endDate (loop break)
+        konto.deposit(13576 + 1000, 1000);
+        konto.print(2008, 1);
+    }
+
+    /**
+     * Testet Getter und Setter für die Buchung (UML-Kompatibilität).
+     */
+    @Test
+    public void testGetSetBooking() {
+        SavingsAccount konto = new SavingsAccount("S-1000");
+        ch.schule.Booking booking = new ch.schule.Booking(13576, 1000);
+        konto.setBooking(booking);
+        assertEquals(booking, konto.getBooking());
     }
 }
