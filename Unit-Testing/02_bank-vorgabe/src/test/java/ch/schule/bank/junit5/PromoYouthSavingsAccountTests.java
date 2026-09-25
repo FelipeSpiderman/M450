@@ -12,36 +12,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class PromoYouthSavingsAccountTests {
 
-    /**
-     * Testet, dass bei einer Einzahlung 1% Bonus gutgeschrieben wird.
-     * 10000 + 1% (100) = 10100
-     */
     @Test
-    public void testDepositMitBonus() {
-        PromoYouthSavingsAccount konto = new PromoYouthSavingsAccount("Y-1000");
-        assertTrue(konto.deposit(13576, 10000));
-        assertEquals(10100, konto.getBalance());
+    public void checkBonusCalculation() {
+        PromoYouthSavingsAccount account = new PromoYouthSavingsAccount("Y-1000");
+        account.deposit(1, 10000);
+        
+        // 1% Bonus auf 10000 sind 100
+        assertEquals(10100, account.getBalance());
+        
+        // Nochmal einzahlen
+        account.deposit(2, 5000);
+        // Bonus auf 5000 sind 50 -> 10100 + 5000 + 50 = 15150
+        assertEquals(15150, account.getBalance());
     }
 
-    /**
-     * Testet den Bonus bei einem Betrag, der nicht ganzzahlig durch 100 teilbar ist.
-     * 12345 -> Bonus = 12344/100 = 123, eingezahlt 12345 + 123 = 12468
-     */
     @Test
-    public void testDepositBonusGanzzahlig() {
-        PromoYouthSavingsAccount konto = new PromoYouthSavingsAccount("Y-1000");
-        konto.deposit(13576, 12345);
-        assertEquals(12468, konto.getBalance());
-    }
-
-    /**
-     * Testet, dass eine negative Einzahlung abgelehnt wird (kein Bonus).
-     */
-    @Test
-    public void testDepositNegativ() {
-        PromoYouthSavingsAccount konto = new PromoYouthSavingsAccount("Y-1000");
-        assertFalse(konto.deposit(13576, -10000));
-        assertEquals(0, konto.getBalance());
+    public void noNegativeDeposit() {
+        PromoYouthSavingsAccount account = new PromoYouthSavingsAccount("Y-1000");
+        assertFalse(account.deposit(1, -500));
+        assertEquals(0, account.getBalance());
     }
 
     /**

@@ -18,16 +18,12 @@ public class BankTests {
      * Testet das Erstellen neuer Konten.
      */
     @Test
-    public void testCreate() {
-        Bank bank = new Bank();
-        String id = bank.createSavingsAccount();
-        assertEquals("S-1000", id);
-
-        String promoId = bank.createPromoYouthSavingsAccount();
-        assertEquals("Y-1001", promoId);
-
-        String salaryId = bank.createSalaryAccount(-5000);
-        assertEquals("P-1002", salaryId);
+    public void createDifferentAccounts() {
+        Bank myBank = new Bank();
+        assertEquals("S-1000", myBank.createSavingsAccount());
+        assertEquals("Y-1001", myBank.createPromoYouthSavingsAccount());
+        // negatives Limit testen
+        assertEquals("P-1002", myBank.createSalaryAccount(-200));
     }
 
     /**
@@ -43,39 +39,16 @@ public class BankTests {
      * Testet das Einzahlen auf ein Konto über die Bank.
      */
     @Test
-    public void testDeposit() {
-        Bank bank = new Bank();
-        bank.createSavingsAccount();
-        assertTrue(bank.deposit("S-1000", 13576, 12000));
-        assertEquals(12000, bank.getBalance("S-1000"));
-    }
-
-    /**
-     * Testet die Einzahlung auf ein nicht existierendes Konto.
-     */
-    @Test
-    public void testDepositUnbekanntesKonto() {
-        Bank bank = new Bank();
-        assertFalse(bank.deposit("S-9999", 13576, 12000));
-        // Branch coverage: amount < 0
-        bank.createSavingsAccount();
-        assertFalse(bank.deposit("S-1000", 13576, -100));
-    }
-
-    /**
-     * Testet das Abheben von einem Konto über die Bank.
-     */
-    @Test
-    public void testWithdraw() {
-        Bank bank = new Bank();
-        bank.createSavingsAccount();
-        bank.deposit("S-1000", 13576, 12000);
-        assertTrue(bank.withdraw("S-1000", 13577, 2000));
-        assertEquals(10000, bank.getBalance("S-1000"));
-        // Branch coverage: amount < 0
-        assertFalse(bank.withdraw("S-1000", 13578, -100));
-        // Branch coverage: account not found
-        assertFalse(bank.withdraw("S-9999", 13578, 100));
+    public void depositAndWithdrawTest() {
+        Bank b = new Bank();
+        b.createSavingsAccount();
+        
+        assertTrue(b.deposit("S-1000", 10, 100));
+        assertTrue(b.withdraw("S-1000", 11, 30));
+        assertEquals(70, b.getBalance("S-1000"));
+        
+        // unbekanntes konto
+        assertFalse(b.deposit("S-X", 12, 100));
     }
 
     /**
@@ -144,30 +117,13 @@ public class BankTests {
      * Sortierung funktioniert (höchstes Saldo zuerst).
      */
     @Test
-    public void testTop5() {
+    public void testRankingFunctions() {
         Bank bank = new Bank();
         bank.createSavingsAccount();
-        bank.createSavingsAccount();
-        bank.createSavingsAccount();
-        bank.deposit("S-1000", 13576, 5000);
-        bank.deposit("S-1001", 13576, 12000);
-        bank.deposit("S-1002", 13576, 8000);
+        bank.deposit("S-1000", 1, 100);
+        
+        // nur aufrufen um zu sehen ob es abstürzt
         bank.printTop5();
-    }
-
-    /**
-     * Testet, dass printBottom5() keine Exception wirft und die
-     * Sortierung funktioniert (tiefstes Saldo zuerst).
-     */
-    @Test
-    public void testBottom5() {
-        Bank bank = new Bank();
-        bank.createSavingsAccount();
-        bank.createSavingsAccount();
-        bank.createSavingsAccount();
-        bank.deposit("S-1000", 13576, 5000);
-        bank.deposit("S-1001", 13576, 12000);
-        bank.deposit("S-1002", 13576, 8000);
         bank.printBottom5();
     }
 

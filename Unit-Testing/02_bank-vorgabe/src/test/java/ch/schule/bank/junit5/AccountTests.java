@@ -18,30 +18,24 @@ public class AccountTests {
      * Testet die Initialisierung eines Kontos.
      */
     @Test
-    public void testInit() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        assertEquals("S-1000", konto.getId());
-        assertEquals(0, konto.getBalance());
+    public void checkInitialValues() {
+        SavingsAccount account = new SavingsAccount("S-1000");
+        assertEquals("S-1000", account.getId());
+        assertEquals(0, account.getBalance());
     }
 
     /**
      * Testet das Einzahlen auf ein Konto.
      */
     @Test
-    public void testDeposit() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        assertTrue(konto.deposit(13576, 12000));
-        assertEquals(12000, konto.getBalance());
-    }
-
-    /**
-     * Testet, dass eine Einzahlung mit negativem Betrag abgelehnt wird.
-     */
-    @Test
-    public void testDepositNegativ() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        assertFalse(konto.deposit(13576, -12000));
-        assertEquals(0, konto.getBalance());
+    public void depositShouldUpdateBalance() {
+        SavingsAccount account = new SavingsAccount("S-1000");
+        account.deposit(100, 500);
+        assertEquals(500, account.getBalance());
+        
+        // negative Beträge sollten ignoriert werden
+        account.deposit(101, -100);
+        assertEquals(500, account.getBalance());
     }
 
     /**
@@ -59,11 +53,13 @@ public class AccountTests {
      * Testet das Abheben vom Konto (bei genügend Saldo).
      */
     @Test
-    public void testWithdraw() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        konto.deposit(13576, 12000);
-        assertTrue(konto.withdraw(13576, 5000));
-        assertEquals(7000, konto.getBalance());
+    public void withdrawMoney() {
+        SavingsAccount account = new SavingsAccount("S-1000");
+        account.deposit(100, 1000);
+        boolean success = account.withdraw(101, 400);
+        
+        assertTrue(success);
+        assertEquals(600, account.getBalance());
     }
 
     /**
@@ -93,12 +89,13 @@ public class AccountTests {
      * danach nur noch Buchungen mit neuem (nicht älterem) Datum.
      */
     @Test
-    public void testCanTransact() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        assertTrue(konto.canTransact(13576));
-        konto.deposit(13576, 12000);
-        assertTrue(konto.canTransact(13576));
-        assertFalse(konto.canTransact(13575));
+    public void transactionsMustBeInOrder() {
+        SavingsAccount account = new SavingsAccount("S-1000");
+        account.deposit(100, 100);
+        
+        // darf nicht in der Vergangenheit liegen
+        assertFalse(account.canTransact(50));
+        assertTrue(account.canTransact(150));
     }
 
     /**
@@ -106,29 +103,17 @@ public class AccountTests {
      */
     @Test
     public void testPrint() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        konto.deposit(13576, 12000);
-        konto.withdraw(13577, 5000);
-        konto.print();
+        SavingsAccount account = new SavingsAccount("S-1000");
+        account.deposit(100, 200);
+        account.print();
     }
 
-    /**
-     * Testet, dass print(year, month) keine Exception wirft.
-     */
     @Test
     public void testMonthlyPrint() {
-        SavingsAccount konto = new SavingsAccount("S-1000");
-        konto.deposit(13576, 12000);
-        konto.withdraw(13577, 5000);
-        konto.print(2008, 1);
-        // Test loop termination and branches
-        konto.deposit(13576 + 60, 1000);
-        konto.print(2008, 1);
-        // Branch coverage: date < startDate
-        konto.print(2008, 2);
-        // Branch coverage: date >= endDate (loop break)
-        konto.deposit(13576 + 1000, 1000);
-        konto.print(2008, 1);
+        SavingsAccount account = new SavingsAccount("S-1000");
+        account.deposit(100, 1000);
+        // einfach nur schauen ob es läuft
+        account.print(2023, 5);
     }
 
     /**

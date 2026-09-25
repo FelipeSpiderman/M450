@@ -10,24 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class BookingTests {
 
-    /**
-     * Testet die Erzeugung einer Buchung (Datum und Betrag).
-     */
     @Test
-    public void testInitialization() {
-        Booking b = new Booking(13576, 12000);
-        assertEquals(13576, b.getDate());
-        assertEquals(12000, b.getAmount());
-    }
-
-    /**
-     * Testet die Erzeugung einer Buchung mit negativem Betrag
-     * (z. B. bei einer Abhebung).
-     */
-    @Test
-    public void testInitializationNegativ() {
-        Booking b = new Booking(13576, -5000);
-        assertEquals(-5000, b.getAmount());
+    public void testBookingProperties() {
+        Booking b1 = new Booking(10, 500);
+        assertEquals(10, b1.getDate());
+        assertEquals(500, b1.getAmount());
+        
+        Booking b2 = new Booking(20, -100);
+        assertEquals(-100, b2.getAmount());
     }
 
     /**

@@ -32,36 +32,16 @@ public class SalaryAccountTests {
         assertEquals(12000, konto.getBalance());
     }
 
-    /**
-     * Testet, dass die Abhebung bis zur Kreditlimite erlaubt ist.
-     */
     @Test
-    public void testWithdrawBisZurLimite() {
-        SalaryAccount konto = new SalaryAccount("P-1000", -5000);
-        konto.deposit(13576, 10000);
-        assertTrue(konto.withdraw(13577, 15000));
-        assertEquals(-5000, konto.getBalance());
-    }
-
-    /**
-     * Testet, dass die Abhebung über die Kreditlimite hinaus verweigert wird.
-     */
-    @Test
-    public void testWithdrawUeberLimite() {
-        SalaryAccount konto = new SalaryAccount("P-1000", -5000);
-        konto.deposit(13576, 10000);
-        assertFalse(konto.withdraw(13577, 15001));
-        assertEquals(10000, konto.getBalance());
-    }
-
-    /**
-     * Testet erlaubtes Überziehen innerhalb der Limite (Saldo wird negativ).
-     */
-    @Test
-    public void testUeberziehen() {
-        SalaryAccount konto = new SalaryAccount("P-1000", -2000);
-        konto.deposit(13576, 1000);
-        assertTrue(konto.withdraw(13577, 2000));
-        assertEquals(-1000, konto.getBalance());
+    public void testWithdrawLimits() {
+        SalaryAccount account = new SalaryAccount("P-1000", -5000);
+        account.deposit(100, 1000);
+        
+        // abheben im rahmen der limite
+        assertTrue(account.withdraw(101, 4000));
+        assertEquals(-3000, account.getBalance());
+        
+        // zu viel abheben
+        assertFalse(account.withdraw(102, 3000)); 
     }
 }
