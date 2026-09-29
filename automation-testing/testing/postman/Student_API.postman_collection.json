@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "c1f76d49-4786-4e0a-b28e-8a14d59a7f32",
+		"name": "TBZ Student API Automation Test Suite",
+		"description": "Automated REST interface tests for Spring Boot Student Backend API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Students",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is acceptable (< 500ms)\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"pm.test(\"Response is a JSON array of students\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\");",
+							"    pm.expect(jsonData.length).to.be.greaterThan(0);",
+							"});",
+							"",
+							"pm.test(\"Each student object has required attributes\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.forEach(function(student) {",
+							"        pm.expect(student).to.have.property(\"id\");",
+							"        pm.expect(student).to.have.property(\"name\");",
+							"        pm.expect(student).to.have.property(\"email\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"students"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Student - Valid Input",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Created student response contains generated id and fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData.name).to.eql(\"Postman Automated Student\");",
+							"    pm.expect(jsonData.email).to.eql(\"postman@tbz.ch\");",
+							"    pm.expect(jsonData.course).to.eql(\"Informatik\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Postman Automated Student\",\n    \"email\": \"postman@tbz.ch\",\n    \"course\": \"Informatik\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"students"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Student - Invalid Email Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Validation error body contains email field error\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(400);",
+							"    pm.expect(jsonData.error).to.eql(\"Validation Failed\");",
+							"    pm.expect(jsonData.errors).to.have.property(\"email\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Invalid Email Student\",\n    \"email\": \"not-a-valid-email-address\",\n    \"course\": \"Informatik\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/students",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"students"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081"
+		}
+	]
+}

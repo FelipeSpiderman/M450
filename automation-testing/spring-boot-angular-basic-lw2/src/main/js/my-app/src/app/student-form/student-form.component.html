@@ -1,0 +1,28 @@
+<div class="card my-5">
+  <div class="card-body">
+    <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+      <div class="form-group mb-3">
+        <label for="name">Name</label>
+        <input type="text" [(ngModel)]="student.name" class="form-control" id="name" name="name" placeholder="Enter your name"
+               required minlength="2" #name="ngModel">
+        <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger mt-1">Name is required (min 2 characters)</div>
+      </div>
+      <div class="form-group mb-3">
+        <label for="email">Email</label>
+        <input type="email" [(ngModel)]="student.email" class="form-control" id="email" name="email" placeholder="Enter your email address"
+               required email #email="ngModel">
+        <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert alert-danger mt-1">A valid email address is required</div>
+      </div>
+      <div class="form-group mb-3">
+        <label for="course">Course</label>
+        <select [(ngModel)]="student.course" class="form-control" id="course" name="course" #course="ngModel">
+          <option value="Informatik">Informatik</option>
+          <option value="Mediamatik">Mediamatik</option>
+          <option value="Elektronik">Elektronik</option>
+          <option value="Wirtschaftsinformatik">Wirtschaftsinformatik</option>
+        </select>
+      </div>
+      <button type="submit" [disabled]="!userForm.form.valid" class="btn btn-info">Submit</button>
+    </form>
+  </div>
+</div>
