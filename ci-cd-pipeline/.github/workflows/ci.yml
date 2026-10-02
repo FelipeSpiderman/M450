@@ -1,0 +1,45 @@
+name: CI / CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Grant execute permission for Maven Wrapper
+        run: chmod +x ./recipe-planner-fronend-and-backend/recipe-planner-backend/mvnw
+
+      - name: Run Unit Tests & Generate Reports
+        working-directory: recipe-planner-fronend-and-backend/recipe-planner-backend
+        run: ./mvnw clean test
+
+      - name: Upload JaCoCo Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/jacoco/
+
+      - name: Upload Surefire Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-report
+          path: |
+            recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/surefire-report.html
+            recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
