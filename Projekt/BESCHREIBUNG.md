@@ -147,4 +147,10 @@ Die Reflexion zu TDD und Code Reviews folgt am Ende des Projekts unter [`docs/re
 
 ## Autor
 
-[Dein Name], [Klasse], TBZ
+Felípe Pereira TBZ
+
+### Nutzvolle LInks
+
+https://me.developers.google.com/
+
+https://developers.google.com/oauthplayground
