@@ -44,14 +44,14 @@ Die Applikation unterstützt drei Wege, um Daten zu erfassen:
 | Bereich | Technologie |
 |---|---|
 | Backend | Java, Spring Boot |
-| Frontend | [z. B. React / Angular / Vue] |
-| Datenbank | [z. B. H2 für Entwicklung, PostgreSQL] |
+| Frontend | React (Vite) |
+| Datenbank | H2 (Tests), PostgreSQL (Betrieb) |
 | Build | Maven / Gradle |
 | Unit Tests | JUnit 5 |
 | Mocking | Mockito |
 | Integration Tests | Spring Boot Test |
 | Code Coverage | JaCoCo, evtl. SonarQube / SonarCloud |
-| CI/CD | GitLab CI/CD |
+| CI/CD | GitHub Actions |
 
 ## Architektur
 
@@ -87,11 +87,11 @@ Das ausführliche Testkonzept befindet sich unter [`docs/testkonzept.md`](docs/t
 
 ## CI/CD-Pipeline
 
-Die GitLab-Pipeline besteht aus folgenden Stages:
+Die GitHub-Actions-Pipeline besteht aus folgenden Stages:
 
 1. **build** – Kompilieren der Applikation
 2. **test** – Ausführen der Unit- und Integration Tests
-3. **report** – Testreports (JUnit-XML) und Code Coverage (JaCoCo) werden in GitLab angezeigt
+3. **report** – Testreports (JUnit-XML) und Code Coverage (JaCoCo) werden als Artefakte in GitHub Actions bereitgestellt
 4. **deploy** – nur beim Merge auf `main`
 
 Schlagen Tests fehl, wird nicht deployed.

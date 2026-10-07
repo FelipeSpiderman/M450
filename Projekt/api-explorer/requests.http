@@ -1,0 +1,70 @@
+### Google Health API – manual requests
+### Works with the VS Code extension "REST Client" (humao.rest-client) or IntelliJ HTTP Client.
+### Get a token: run `node explore.mjs` once, or use the "refresh" request below and copy access_token.
+
+@baseUrl = https://health.googleapis.com/v4/users/me
+@token = PASTE_ACCESS_TOKEN_HERE
+
+### Refresh the access token (fill in your values, do not commit them!)
+POST https://oauth2.googleapis.com/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET&refresh_token=YOUR_REFRESH_TOKEN&grant_type=refresh_token
+
+### Identity – is the account linked?
+GET {{baseUrl}}/identity
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Paired devices
+GET {{baseUrl}}/pairedDevices
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Steps per day
+POST {{baseUrl}}/dataTypes/steps/dataPoints:dailyRollUp
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "range": {
+    "start": { "date": { "year": 2026, "month": 10, "day": 1 }, "time": {} },
+    "end":   { "date": { "year": 2026, "month": 10, "day": 7 }, "time": {} }
+  },
+  "windowSizeDays": 1
+}
+
+### Steps (raw, deduplicated)
+GET {{baseUrl}}/dataTypes/steps/dataPoints:reconcile?filter=steps.interval.civil_start_time%20%3E%3D%20%222026-10-06T00:00:00%22
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Sleep sessions
+GET {{baseUrl}}/dataTypes/sleep/dataPoints:reconcile
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Exercises / activities
+GET {{baseUrl}}/dataTypes/exercise/dataPoints:reconcile
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Active zone minutes per day
+POST {{baseUrl}}/dataTypes/active-zone-minutes/dataPoints:dailyRollUp
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "range": {
+    "start": { "date": { "year": 2026, "month": 10, "day": 1 }, "time": {} },
+    "end":   { "date": { "year": 2026, "month": 10, "day": 7 }, "time": {} }
+  },
+  "windowSizeDays": 1
+}
+
+### Daily resting heart rate
+GET {{baseUrl}}/dataTypes/daily-resting-heart-rate/dataPoints:reconcile
+Authorization: Bearer {{token}}
+Accept: application/json
