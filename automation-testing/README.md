@@ -237,4 +237,20 @@ npx playwright install
 ```
 
 ---
+
+## Nachtrag 12.10.2026
+
+- **Echter E2E-Test:** Zu den bestehenden Playwright-Tests (Backend gemockt) kommt `e2e/full-stack.spec.ts` dazu.
+  Er geht wirklich durch Browser → Angular → Spring Boot → H2. Alle 5 Tests laufen grün.
+- **Maven Wrapper repariert:** `./mvnw` wollte `.mvn/wrapper/maven-wrapper.properties` lesen, und die Datei war nie
+  im Repo. Jetzt funktioniert das Starten mit `./mvnw spring-boot:run` auch nach einem frischen Clone.
+- **Lasttest nachgemessen**, diesmal mit gespeicherter Tool-Ausgabe (`testing/load-results/`). Dabei ist mir
+  aufgefallen, dass `GET /students` keine Paginierung hat: Nach dem POST-Test mit über 64'000 neuen Einträgen
+  schafft der Endpunkt nur noch 28 statt etwa 10'000 Requests pro Sekunde.
+- Generierte Playwright-Reports sind nicht mehr im Repo (`.gitignore`).
+
+**KI-Nutzung:** Diese Nachträge wurden mit Claude Code (KI-Agent) erarbeitet. Ich habe die Tests und Messungen
+selbst nachvollzogen.
+
+---
 *TBZ – Modul M450: Automation Testing*

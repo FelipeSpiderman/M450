@@ -1,11 +1,11 @@
 # Test Driven Development – FancyApp
 
-Vorgabe: [Unterlagen/test-driven-development/UEBUNGEN.md](https://gitlab.com/ch-tbz-it/Stud/m450/m450/-/blob/main/Unterlagen/test-driven-development/UEBUNGEN.md)
+Aufgabe: [Unterlagen/test-driven-development/UEBUNGEN.md](https://gitlab.com/ch-tbz-it/Stud/m450/m450/-/blob/main/Unterlagen/test-driven-development/UEBUNGEN.md)
 Code: [FancyApp/](FancyApp)
 
 ## Aufgabe 1 – Setup
 
-PHPUnit 11 wird pro Projekt über Composer installiert (`composer.json`), die Konfiguration steht in `phpunit.xml`.
+PHPUnit 11 ist über Composer installiert (`composer.json`, `phpunit.xml`). Gestartet wird mit:
 
 ```bash
 cd FancyApp
@@ -13,55 +13,36 @@ composer install
 vendor/bin/phpunit
 ```
 
-Ohne lokales PHP geht es auch mit Docker:
+Ohne lokales PHP geht es auch über das Docker-Image `composer:2`.
 
-```bash
-cd FancyApp
-docker run --rm -u $(id -u):$(id -g) -v "$PWD":/app -w /app composer:2 composer install
-docker run --rm -u $(id -u):$(id -g) -v "$PWD":/app -w /app composer:2 php vendor/bin/phpunit
-```
+In `Testcases/Test.php` musste ich für die neue PHPUnit-Version `TestCase` statt `PHPUnit_Framework_TestCase`
+verwenden. Das steht auch so im Kommentar in der Datei. Ausserdem habe ich den `require_once`-Pfad mit `__DIR__`
+ergänzt. An den Testfällen selbst ist nichts geändert.
 
-Einzige Anpassung an `Testcases/Test.php`: Wie im Kommentar der Datei beschrieben, wurde für neuere
-PHPUnit-Versionen auf `use PHPUnit\Framework\TestCase;` umgestellt. Ausserdem steht vor dem `require_once`-Pfad
-jetzt `__DIR__`, damit die Tests von jedem Ordner aus laufen. Die Testfälle selbst sind unverändert.
+## Aufgabe 2 – Methoden implementieren
 
-## Aufgabe 2 – Methoden implementieren (Red → Green)
+Am Anfang waren alle 3 Tests rot (Ausgabe in [docs/01-red.log](FancyApp/docs/01-red.log)). Danach wurde eine
+Methode nach der anderen umgesetzt, jeweils mit eigenem Commit, bis alle Tests grün waren
+([docs/02-green.log](FancyApp/docs/02-green.log), 3 Tests, 27 Assertions).
 
-Jeder Schritt ist ein eigener Commit (`git log -- 03_test-driven-development`):
+Was die Tests von den Methoden verlangen:
 
-| Schritt | Ergebnis |
-|---|---|
-| RED: Vorgabe unverändert ausgeführt | 3 / 3 Tests rot ([docs/01-red.log](FancyApp/docs/01-red.log)) |
-| `shortString` implementiert | 1 / 3 grün |
-| `calcAverage` implementiert | 2 / 3 grün |
-| `getOpposite` implementiert | 3 / 3 grün, 27 Assertions ([docs/02-green.log](FancyApp/docs/02-green.log)) |
+- `shortString`: kürzt einen Text auf eine maximale Länge und hängt ein Ende an (Standard `...`). Ist das Ende
+  länger als die erlaubte Länge, kommt `false` zurück. Wegen des `ä` im Testtext müssen die `mb_`-Funktionen
+  verwendet werden.
+- `calcAverage`: Durchschnitt einer Liste. Leere Liste ergibt 0, Zahlen als Strings sind okay, Wörter wie
+  „bestanden“ ergeben `false`.
+- `getOpposite`: macht aus einem Array einen String (`implode`) und aus einem String ein Array (`explode`).
+  Bei allem anderen kommt `false` zurück.
 
-Aus den Tests abgeleitete Anforderungen:
+Aufgefallen ist mir: Schon im roten Zustand ging die erste Assertion durch. `assertEquals('', null)` vergleicht
+nämlich nur lose, und `null` gilt dabei als gleich wie ein leerer String. Mit `assertSame` wäre das nicht passiert.
 
-- **`shortString($text, $length, $ending = '...')`**
-  - Ist `$ending` länger als `$length`, wird `false` zurückgegeben. Das wird zuerst geprüft, auch bei leerem Text.
-  - Ist der Text kurz genug, wird er unverändert zurückgegeben.
-  - Sonst wird er auf `$length - len($ending)` Zeichen gekürzt und `$ending` angehängt, sodass das Resultat genau `$length` lang ist.
-  - Der Testtext enthält ein `ä`. `strlen` zählt Bytes, deshalb werden `mb_strlen` / `mb_substr` verwendet.
-- **`calcAverage($values)`**
-  - Ein leeres Array ergibt `0`.
-  - Numerische Strings wie `'4.5'` zählen wie Zahlen.
-  - Sobald ein Wert nicht numerisch ist (`'bestanden'`), wird `false` zurückgegeben.
-- **`getOpposite($value, $delimiter = ',')`**
-  - Ein Array wird mit `implode` zu einem String, ein String mit `explode` zu einem Array.
-  - Andere Typen (z.B. ein Objekt) ergeben `false`.
-  - Damit gilt `getOpposite(getOpposite($x)) === $x`.
+## Aufgabe 3 – Vergleich mit anderen Gruppen
 
-Beobachtung: Schon im RED-Lauf war die erste Assertion von `testShortString` erfüllt.
-`assertEquals('', null)` vergleicht lose (`==`), also gilt `null` als gleich wie `''`. Mit `assertSame` wäre
-das aufgefallen.
+*Noch offen.*
 
-## Aufgabe 3 – Auswertung
+## KI-Nutzung
 
-> Zu ergänzen nach dem Vergleich mit anderen Gruppen (Text-Compare-Tool, z.B. `diff` oder der Vergleich in der IDE).
-
-- Gruppe(n), mit denen verglichen wurde:
-- Gleich implementiert?
-- Abweichungen im Verhalten (z.B. `strlen` statt `mb_strlen`, Umgang mit leerem Delimiter, Typ des Rückgabewerts):
-- Sind die Abweichungen gross oder vernachlässigbar?
-- Fazit: Beschreiben die Tests die Anforderungen vollständig? Was lassen sie offen?
+Das Setup und die Implementierung der drei Methoden hat Claude Code (KI-Agent) erstellt. Der KI-Rahmen des Moduls
+erlaubt das nicht. Deshalb löse ich die Methoden noch selbst und passe diesen Abschnitt danach an.

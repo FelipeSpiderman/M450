@@ -186,3 +186,18 @@ Nach jedem Durchlauf stehen die Reports direkt im GitHub Actions Tab unter **Art
    npm start
    ```
    *Die React-Anwendung oeffnet sich anschliessend unter `http://localhost:3000`.*
+
+---
+
+## Nachtrag 12.10.2026
+
+Bei einer Kontrolle habe ich zwei Sachen gefunden und korrigiert:
+
+- Unter `ci-cd-pipeline/.github/workflows/` lag eine zweite `ci.yml`. GitHub führt aber nur Workflows aus dem
+  Root aus, also lief diese nie. Ich habe sie gelöscht und die Doku oben an die richtige Pipeline angepasst.
+- Wenn ein Test rot war, ist Maven abgebrochen, bevor die HTML-Reports erstellt wurden. Jetzt laufen die Tests mit
+  `-Dmaven.test.failure.ignore=true`, die Reports werden immer hochgeladen und erst ein letzter Schritt macht die
+  Pipeline rot.
+
+**KI-Nutzung:** Gefunden und umgesetzt wurden diese Korrekturen mit Claude Code (KI-Agent). Ich habe sie
+nachvollzogen und lokal sowie in der Pipeline getestet.

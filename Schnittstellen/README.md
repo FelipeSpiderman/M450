@@ -1,54 +1,53 @@
 # Schnittstellen – Addressbook Backend
 
-Vorgabe: [Unterlagen/schnittstellen/UEBUNGEN.md](https://gitlab.com/ch-tbz-it/Stud/m450/m450/-/blob/main/Unterlagen/schnittstellen/UEBUNGEN.md)
-Projekt: [addressbook-backend-v1-1](addressbook-backend-v1-1) (Spring Boot 3.5, Java 21)
-
-Tests ausführen:
+Aufgabe: [Unterlagen/schnittstellen/UEBUNGEN.md](https://gitlab.com/ch-tbz-it/Stud/m450/m450/-/blob/main/Unterlagen/schnittstellen/UEBUNGEN.md)
+Code: [addressbook-backend-v1-1](addressbook-backend-v1-1) (Spring Boot 3.5, Java 21)
 
 ```bash
 cd addressbook-backend-v1-1
 ./mvnw test
 ```
 
-## Aufgabe 1 – Tests für alle Klassen
+Ergebnis: 20 Tests, alle grün.
 
-| Klasse | Test | Was wird geprüft |
-|---|---|---|
-| `Address` | `repository/AddressTest` | Erstellen von Adressen über beide Konstruktoren, Getter/Setter |
-| `AddressService` | `service/AddressServiceTest` | `save`, `getAll` (inkl. Sortierung), `getAddress` gefunden / nicht gefunden |
-| `AddressController` | `controller/AddressControllerTest` | HTTP-Status 201 / 200 / 404, Delegation an den Service |
-| `AddressComparator` | `util/AddressComparatorTest` | Sortierreihenfolge, `null`-Handling, Sortieren einer Liste |
-| `AddressbookApplication` | `AddressbookApplicationTest` | Spring-Kontext startet |
+## Aufgabe 1
 
-`AddressRepository` ist ein Interface von Spring Data und braucht keinen eigenen Test.
+Für jede Klasse gibt es eine Testklasse:
 
-**Mocking der H2-Datenbank:** Im `AddressServiceTest` ersetzt `@Mock AddressRepository` die Datenbank,
-`@InjectMocks` gibt den Mock an den Service weiter. Der Service wird damit isoliert getestet. Mit `when(...)`
-werden die Rückgabewerte festgelegt, mit `verify(...)` wird geprüft, ob das Repository aufgerufen wurde.
-Der `getAll`-Test gibt dem Mock eine **unsortierte** Liste. So wird die Sortierlogik im Service geprüft
-und nicht die Datenbank.
+- `AddressTest`: Adressen über beide Konstruktoren erstellen, Getter und Setter
+- `AddressServiceTest`: speichern, alle holen (inkl. Sortierung), eine holen (gefunden / nicht gefunden)
+- `AddressControllerTest`: richtige HTTP-Statuscodes (201, 200, 404)
+- `AddressComparatorTest`: Sortierreihenfolge und `null`-Werte
+- `AddressbookApplicationTest`: die Applikation startet
 
-**`@BeforeEach`** baut in allen Unit-Tests die Testobjekte vor jedem Test neu auf. Die Tests sind
-dadurch unabhängig voneinander.
+Das `AddressRepository` ist nur ein Spring-Data-Interface, darum hat es keinen eigenen Test.
 
-**Comparator korrekt implementiert:** Die Vorgabe gab immer `-1` zurück. Das verletzt den
-`Comparator`-Vertrag (`compare(a, b)` und `compare(b, a)` waren beide negativ). Die erste korrekte
-Version vergleicht nach **Nachname**, dann **Vorname**.
+Im `AddressServiceTest` ist die H2-Datenbank weggemockt. Mit `@Mock` wird das Repository ein Mock, `@InjectMocks`
+gibt ihn dem Service mit. Bei `getAll` gibt der Mock die Adressen absichtlich unsortiert zurück. So sieht man, dass
+wirklich der Service sortiert und nicht die Datenbank.
 
-## Aufgabe 2 – Comparator erweitert
+`@BeforeEach` erstellt vor jedem Test die Testdaten neu, damit sich die Tests nicht gegenseitig beeinflussen.
 
-Bei gleichem Namen vergleicht der Comparator jetzt nach zusätzlichen Attributen:
+Die vorgegebene Comparator-Klasse hat immer `-1` zurückgegeben, egal was man verglichen hat. Richtig ist: zuerst
+nach Nachname vergleichen, bei Gleichstand nach Vorname (Gross-/Kleinschreibung egal).
 
-1. Nachname (ohne Gross-/Kleinschreibung)
-2. Vorname
-3. **Telefonnummer** *(neu)*
-4. **Registrierungsdatum** *(neu)*
-5. **ID** *(neu, als letztes Kriterium, damit `0` nur bei wirklich gleichen Adressen zurückkommt)*
+## Aufgabe 2
 
-Ausserdem werden `null`-Werte (ganze Adresse oder einzelne Felder) immer **ans Ende** sortiert, statt eine
-`NullPointerException` auszulösen.
+Den Comparator habe ich erweitert. Bei gleichem Namen wird jetzt weiter verglichen nach:
 
-Neue Tests dazu in `AddressComparatorTest`:
-`testCompareSameNameDifferentPhonenumber`, `testCompareSameNameAndPhoneDifferentDate`,
-`testCompareSameNamePhoneAndDateDifferentId`, `testCompareIdenticalAddresses`,
-`testCompareWithNullAddresses`, `testCompareWithNullAttributes`, `testSortingListWithComparator`.
+1. Telefonnummer
+2. Registrierungsdatum
+3. ID (damit nur bei wirklich gleichen Adressen `0` herauskommt)
+
+Ausserdem kommen `null`-Werte immer ans Ende der Liste. Vorher gab es dort eine `NullPointerException`.
+
+Die neuen Fälle sind in `AddressComparatorTest` getestet: unterschiedliche Telefonnummer, unterschiedliches Datum,
+unterschiedliche ID, identische Adressen, `null`-Adressen, `null`-Felder und das Sortieren einer ganzen Liste.
+
+## Nachtrag 12.10.2026
+
+In der `pom.xml` waren `mockito-core` und `junit-jupiter-api` mit eigenen Versionen eingetragen. Spring Boot bringt
+über `spring-boot-starter-test` aber schon passende Versionen mit. Gemischte Versionen können dazu führen, dass
+JUnit die Tests nicht findet. Darum habe ich die zwei Einträge entfernt.
+
+**KI-Nutzung:** Diese README und die Korrektur an der `pom.xml` sind mit Claude Code (KI-Agent) entstanden.
