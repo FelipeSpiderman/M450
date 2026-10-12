@@ -39,5 +39,13 @@ class MyFancyClass
     }
 
     public function getOpposite($value, $delimiter = ',') {
+        // array -> string and string -> array, so getOpposite(getOpposite($x)) === $x
+        if (is_array($value)) {
+            return implode($delimiter, $value);
+        }
+        if (is_string($value) && $delimiter !== '') {
+            return explode($delimiter, $value);
+        }
+        return false;
     }
 }
