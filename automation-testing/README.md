@@ -24,23 +24,21 @@ Dieses Repository umfasst die vollständige, praxiserprobte Testautomatisierungs
 7. [Bonus-Feature: Kurszuordnung, Validierung & Error Handling](#7-bonus-feature-kurszuordnung-validierung--error-handling)
    - [7.1 Feature-Beschreibung](#71-feature-beschreibung)
    - [7.2 Zeitschätzung vs. Ist-Aufwand & Reflexion](#72-zeitschätzung-vs-ist-aufwand--reflexion)
-8. [CI/CD Pipeline (GitHub Actions)](#8-cicd-pipeline-github-actions)
-9. [Troubleshooting & Häufige Fragen (FAQ)](#9-troubleshooting--häufige-fragen-faq)
+8. [Troubleshooting & Häufige Fragen (FAQ)](#8-troubleshooting--häufige-fragen-faq)
 
 ---
 
 ## 1. Status & Übersicht der Aufgaben
 
-Alle geforderten Aufgaben und Erweiterungen wurden vollständig implementiert, dokumentiert und getestet:
+Übersicht der Aufgaben und wo sie umgesetzt sind:
 
 | Aufgabe / Modul | Status | Hauptbestandteile & Artefakte |
 | :--- | :--- | :--- |
 | **Lokales Setup** | **Vollständig** | Spring Boot 3.1.2 Backend (Port 8081), Angular 16 Frontend (Port 4200), H2 In-Memory DB |
 | **Übung 1 (REST Tests)** | **Vollständig** | MockMvc Testsuite (`StudentControllerIntegrationTest.java`), Postman Collection (`Student_API.postman_collection.json`) |
-| **Übung 2 (Frontend E2E)** | **Vollständig** | Playwright Testsuite (`student-app.spec.ts`) mit 4 Testszenarien (Routing, Mocking, Formularvalidierung) |
+| **Übung 2 (Frontend E2E)** | **Vollständig** | Playwright: `student-app.spec.ts` (4 Szenarien, Backend gemockt) und `full-stack.spec.ts` (echter Durchlauf Browser → Spring Boot → H2) |
 | **Übung 3 (Load Testing)** | **Vollständig** | Last- und Stresstests mit ApacheBench (`ab`) & `autocannon` inkl. Latenz-Percentilen und Bottleneck-Analyse |
 | **Bonusaufgabe** | **Vollständig** | Kurszuordnung (`course`), Jakarta Bean Validation (`@Valid`, `@Email`, `@NotBlank`), `@RestControllerAdvice`, Zeitschätzung & Reflexion |
-| **CI/CD Automation** | **Vollständig** | GitHub Actions Workflow (`.github/workflows/ci.yml`) für automatisierte Backend- und Frontend-Builds |
 
 ---
 
@@ -141,10 +139,21 @@ Mit **Microsoft Playwright** werden echte Interaktionen im Browser automatisiert
 3. **Formular & Erstellung:** Ausfüllen des Formulars, Dropdown-Auswahl des Kurses, Absenden und Weiterleitung.
 4. **Client-Validierung:** Deaktivierter Submit-Button solange Pflichtfelder fehlen oder ungültig sind.
 
+Die Szenarien 2 und 3 ersetzen das Backend mit `page.route()` durch Testdaten. Dadurch laufen sie isoliert und
+stabil, testen aber nicht den ganzen Weg. Deshalb gibt es zusätzlich `e2e/full-stack.spec.ts`: Er legt über das
+GUI einen Studenten an, gegen das **echte** Spring-Boot-Backend, und prüft das Ergebnis im GUI und über die
+REST-API. Läuft das Backend nicht, wird dieser Test mit einem Hinweis übersprungen.
+
 ### 5.2 Ausführung
 ```bash
+# Terminal 1 (nur für full-stack.spec.ts nötig): Backend starten
+cd spring-boot-angular-basic-lw2
+./mvnw spring-boot:run
+
+# Terminal 2: E2E-Tests (startet das Angular-Frontend automatisch)
 cd spring-boot-angular-basic-lw2/src/main/js/my-app
 npm run test:e2e
+npx playwright show-report   # HTML-Report ansehen
 ```
 
 ---
@@ -200,16 +209,7 @@ npm run test:e2e
 
 ---
 
-## 8. CI/CD Pipeline (GitHub Actions)
-
-Die Datei `.github/workflows/ci.yml` automatisiert den gesamten Build- und Testablauf bei jedem Push:
-1. Setup von Java 17 und Node.js 18.
-2. Kompilierung des Spring Boot Backends und Ausführung der MockMvc Tests (`mvn test`).
-3. Installation der Frontend-Abhängigkeiten und Ausführung des Angular Builds (`ng build`).
-
----
-
-## 9. Troubleshooting & Häufige Fragen (FAQ)
+## 8. Troubleshooting & Häufige Fragen (FAQ)
 
 ### Backend startet nicht (Port 8081 belegt):
 Prüfen Sie, ob ein alter Prozess läuft:
@@ -230,4 +230,4 @@ npx playwright install
 ```
 
 ---
-*TBZ – Modul M450: Automation Testing | Erstellt gemäss Schweizer Standarddeutsch.*
+*TBZ – Modul M450: Automation Testing*
