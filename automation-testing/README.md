@@ -185,7 +185,14 @@ npx playwright show-report   # HTML-Report ansehen
   - Durchsatz: **56'739 Req/s**
   - Median Latenz (p50): **24 ms**, p99: **62 ms**, Max: **78 ms**
 
+#### Nachmessung mit Rohdaten (WSL2/Docker)
+Die Werte oben stammen aus der ersten Messung (ohne Rohdaten). Die Nachmessung mit gespeicherter Tool-Ausgabe
+([`testing/load-results/`](testing/load-results)) ergab GET etwa **10'000 req/s** und POST etwa **12'900 req/s**
+(autocannon), jeweils ohne Fehler. Nach dem POST-Test (64'660 neue Datensätze) fällt `GET /students` auf
+**28 req/s**, weil die Liste nicht paginiert ist. Details: [UEBUNG_3_LOAD_TESTING.md, Abschnitt 4](./UEBUNG_3_LOAD_TESTING.md#4-nachmessung-mit-rohdaten-12102026).
+
 ### 6.3 Potenzielle Flaschenhälse (Bottlenecks)
+- **Fehlende Paginierung bei `GET /students`** (in der Nachmessung gemessen: 4,8 MB pro Antwort, 28 req/s)
 1. **HikariCP Connection Pool:** Standardmässig auf 10 Verbindungen limitiert.
 2. **Tomcat Worker Threads:** Standardmässig 200 blockierende Worker-Threads.
 3. **Garbage Collection (GC):** Hohe Objektallokation bei zehntausenden JSON-DTOs pro Sekunde.
