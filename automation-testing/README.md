@@ -192,10 +192,10 @@ Die Werte oben stammen aus der ersten Messung (ohne Rohdaten). Die Nachmessung m
 **28 req/s**, weil die Liste nicht paginiert ist. Details: [UEBUNG_3_LOAD_TESTING.md, Abschnitt 4](./UEBUNG_3_LOAD_TESTING.md#4-nachmessung-mit-rohdaten-12102026).
 
 ### 6.3 Potenzielle Flaschenhälse (Bottlenecks)
-- **Fehlende Paginierung bei `GET /students`** (in der Nachmessung gemessen: 4,8 MB pro Antwort, 28 req/s)
-1. **HikariCP Connection Pool:** Standardmässig auf 10 Verbindungen limitiert.
-2. **Tomcat Worker Threads:** Standardmässig 200 blockierende Worker-Threads.
-3. **Garbage Collection (GC):** Hohe Objektallokation bei zehntausenden JSON-DTOs pro Sekunde.
+1. **Fehlende Paginierung bei `GET /students`:** (in der Nachmessung gemessen: 4,8 MB pro Antwort, 28 req/s)
+2. **HikariCP Connection Pool:** Standardmässig auf 10 Verbindungen limitiert.
+3. **Tomcat Worker Threads:** Standardmässig 200 blockierende Worker-Threads.
+4. **Garbage Collection (GC):** Hohe Objektallokation bei zehntausenden JSON-DTOs pro Sekunde.
 
 ---
 
