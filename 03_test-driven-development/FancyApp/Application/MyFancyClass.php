@@ -13,6 +13,14 @@
 class MyFancyClass
 {
     public function shortString($text, $length, $ending = '...') {
+        // the ending has to fit into the requested length
+        if (mb_strlen($ending) > $length) {
+            return false;
+        }
+        if (mb_strlen($text) <= $length) {
+            return $text;
+        }
+        return mb_substr($text, 0, $length - mb_strlen($ending)) . $ending;
     }
 
     public function calcAverage($values) {
