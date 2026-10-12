@@ -24,6 +24,18 @@ class MyFancyClass
     }
 
     public function calcAverage($values) {
+        if (count($values) === 0) {
+            return 0;
+        }
+        $sum = 0;
+        foreach ($values as $value) {
+            // numeric strings like '4.5' are allowed, words like 'bestanden' are not
+            if (!is_numeric($value)) {
+                return false;
+            }
+            $sum += (float) $value;
+        }
+        return $sum / count($values);
     }
 
     public function getOpposite($value, $delimiter = ',') {
