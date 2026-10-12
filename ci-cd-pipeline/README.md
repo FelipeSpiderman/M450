@@ -117,24 +117,27 @@ xdg-open target/site/jacoco/index.html
 
 ## Aufgabe 3: CI/CD Pipeline (GitHub Actions)
 
-Die Pipeline ist unter `.github/workflows/ci.yml` im Repository-Root definiert.
+Die Pipeline ist unter `.github/workflows/ci.yml` im Repository-Root definiert (GitHub Actions liest Workflows nur von dort).
 
 ### Workflow-Uebersicht
 - **Trigger:**
-  - Jeder `git push` auf den Branch `main`
-  - Jeder `pull_request` gegen den Branch `main`
+  - Jeder `git push` auf einen beliebigen Branch
+  - Jeder `pull_request`
 - **Runner-Umgebung:** `ubuntu-latest`
 - **Java-Version:** OpenJDK 21 (Temurin)
+- **Arbeitsverzeichnis:** `ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend`
 
 ### Pipeline-Schritte
-1. **Checkout Code:** Laedt das gesamte Repository herunter.
+1. **Checkout Repository:** Laedt das gesamte Repository herunter.
 2. **Set up JDK 21:** Richtet Java 21 und den Maven-Cache ein.
-3. **Run Unit Tests & Generate Reports:**  
-   Fuehrt `./mvnw clean test` im Ordner `recipe-planner-backend` aus.
-4. **Upload JaCoCo Coverage Report:**  
-   Laedt `target/site/jacoco/` als Workflow-Artefakt `jacoco-coverage-report` hoch.
-5. **Upload Surefire Test Report:**  
-   Laedt `target/site/` & `target/surefire-reports/` als Artefakt `surefire-test-report` hoch.
+3. **Run Unit Tests and Generate Reports:**  
+   Fuehrt `./mvnw clean test -Dmaven.test.failure.ignore=true` aus. Dadurch werden die HTML-Reports
+   (JaCoCo, Surefire) auch dann erzeugt, wenn ein Test fehlschlaegt.
+4. **Upload Test and Coverage Reports:**  
+   Laedt `target/site/` (JaCoCo + Surefire HTML) und `target/surefire-reports/` als Artefakt
+   `test-and-coverage-reports` hoch (immer, auch bei Fehlern; 14 Tage aufbewahrt).
+5. **Fail on Test Failures:**  
+   Prueft die Surefire-XML-Dateien und laesst die Pipeline rot werden, falls ein Test fehlgeschlagen ist.
 
 ### Artefakte & Reports in der Pipeline
 Nach jedem Durchlauf stehen die Reports direkt im GitHub Actions Tab unter **Artifacts** zum Download bereit.

@@ -422,23 +422,27 @@ Nach erfolgreichem Durchlauf liegen die Reports an folgenden Orten:
 
 ### 4.1 GitHub Actions Workflow erstellen
 
-Erstellen Sie die Datei `.github/workflows/ci.yml` im Stammverzeichnis des Repositories:
+Erstellen Sie die Datei `.github/workflows/ci.yml` im Stammverzeichnis des Repositories (nicht im Unterordner `ci-cd-pipeline/`, dort wird sie von GitHub ignoriert):
 
 ```yaml
-name: CI / CD Pipeline
+name: Backend CI Pipeline
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "**" ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -448,28 +452,30 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Grant execute permission for Maven Wrapper
-        run: chmod +x ./recipe-planner-fronend-and-backend/recipe-planner-backend/mvnw
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
 
-      - name: Run Unit Tests & Generate Reports
-        working-directory: recipe-planner-fronend-and-backend/recipe-planner-backend
-        run: ./mvnw clean test
+      # Testfehler brechen den Build hier noch nicht ab, damit JaCoCo- und Surefire-HTML-Reports
+      # auch bei roten Tests erzeugt werden. Der Schritt "Fail on Test Failures" bricht danach ab.
+      - name: Run Unit Tests and Generate Reports
+        run: ./mvnw clean test -Dmaven.test.failure.ignore=true
 
-      - name: Upload JaCoCo Coverage Report
-        if: always()
+      - name: Upload Test and Coverage Reports
         uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-coverage-report
-          path: recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/jacoco/
-
-      - name: Upload Surefire Test Report
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: surefire-test-report
+          name: test-and-coverage-reports
           path: |
-            recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/surefire-report.html
-            recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
+            ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/
+            ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
+          retention-days: 14
+
+      - name: Fail on Test Failures
+        run: |
+          if grep -lE '<(failure|error)[ >]' target/surefire-reports/TEST-*.xml; then
+            echo "Mindestens ein Test ist fehlgeschlagen - Details im Artefakt test-and-coverage-reports."
+            exit 1
+          fi
 ```
 
 ### 4.2 GitLab CI Alternative (optional)
@@ -485,14 +491,14 @@ stages:
 test_backend:
   stage: test
   script:
-    - cd recipe-planner-fronend-and-backend/recipe-planner-backend
+    - cd ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend
     - chmod +x ./mvnw
-    - ./mvnw clean test
+    - ./mvnw clean test -Dmaven.test.failure.ignore=true
   artifacts:
     when: always
     paths:
-      - recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/
-      - recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
+      - ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/
+      - ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
 ```
 
 ### 4.3 Pipeline testen & Artefakte prüfen
@@ -505,7 +511,7 @@ test_backend:
    ```
 2. Öffnen Sie Ihr GitHub-Repository im Browser und klicken Sie auf den Reiter **Actions**.
 3. Klicken Sie auf den aktuellen Pipeline-Lauf.
-4. Nach Abschluss finden Sie im Bereich **Artifacts** die herunterladbaren Berichte (`jacoco-coverage-report` und `surefire-test-report`).
+4. Nach Abschluss finden Sie im Bereich **Artifacts** das herunterladbare Artefakt `test-and-coverage-reports` (enthält `site/jacoco/index.html` und `site/surefire-report.html`).
 
 ---
 

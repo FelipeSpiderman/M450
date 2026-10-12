@@ -28,8 +28,10 @@ jobs:
       - name: Make mvnw executable
         run: chmod +x ./mvnw
 
+      # Testfehler brechen den Build hier noch nicht ab, damit JaCoCo- und Surefire-HTML-Reports
+      # auch bei roten Tests erzeugt werden. Der Schritt "Fail on Test Failures" bricht danach ab.
       - name: Run Unit Tests and Generate Reports
-        run: ./mvnw clean test
+        run: ./mvnw clean test -Dmaven.test.failure.ignore=true
 
       - name: Upload Test and Coverage Reports
         uses: actions/upload-artifact@v4
@@ -40,3 +42,10 @@ jobs:
             ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/site/
             ci-cd-pipeline/recipe-planner-fronend-and-backend/recipe-planner-backend/target/surefire-reports/
           retention-days: 14
+
+      - name: Fail on Test Failures
+        run: |
+          if grep -lE '<(failure|error)[ >]' target/surefire-reports/TEST-*.xml; then
+            echo "Mindestens ein Test ist fehlgeschlagen - Details im Artefakt test-and-coverage-reports."
+            exit 1
+          fi
