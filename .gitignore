@@ -16,3 +16,6 @@ Projekt/ImportStructure
 # Secrets and personal health data
 .env
 Projekt/api-explorer/samples/
+
+# Node
+node_modules/
