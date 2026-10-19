@@ -27,6 +27,18 @@ paar Minuten, weil Maven alles herunterlädt. Stoppen mit `docker stop student-b
 Ordner hat im Repo gefehlt. Jetzt ist der Wrapper 3.3.4 drin, der lädt Maven selbst herunter und braucht keine
 `.jar`-Datei.
 
+## 1.1. Frontend starten (Angular GUI)
+
+Das Angular-Frontend liegt im Unterordner `spring-boot-angular-basic-lw2/src/main/js/my-app`.
+
+```bash
+cd automation-testing/spring-boot-angular-basic-lw2/src/main/js/my-app
+npm install  # bzw. npm ci
+npm start    # oder: npx ng serve
+```
+
+Die Anwendung ist anschliessend unter **http://localhost:4200** im Browser erreichbar und kommuniziert mit dem Backend auf Port 8081.
+
 ## 2. Backend-Tests (Übung 1)
 
 ```bash
@@ -67,6 +79,16 @@ docker run --rm --network host --ipc=host -u $(id -u):$(id -g) -e HOME=/tmp \
 ## 4. Lasttest (Übung 3)
 
 Backend frisch starten, damit nur die 5 Startdaten drin sind. Dann:
+
+### Automatisierter Test & Verifikation (All-in-One Skript)
+
+Führt Verfügbarkeits-Check, GET-Benchmark, POST-Stresstest und abschliessende Funktionsprüfung automatisiert durch:
+
+```bash
+node testing/run-load-tests.js
+```
+
+### Manuelle Tests mit ApacheBench & Autocannon
 
 ```bash
 # GET mit ApacheBench

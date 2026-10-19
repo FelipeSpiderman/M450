@@ -1,4 +1,4 @@
-package ch.schule;
+package main.java.ch.schule;
 
 /**
  * Promotional youth savings account.

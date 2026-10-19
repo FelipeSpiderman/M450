@@ -1,6 +1,6 @@
-package ch.schule.bank.junit5;
+package test.java.ch.schule.bank.junit5;
 
-import ch.schule.SalaryAccount;
+import main.java.ch.schule.SalaryAccount;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,40 +8,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests für die Klasse SalaryAccount.
+ * Tests für das Lohnkonto.
  */
 public class SalaryAccountTests {
 
-    /**
-     * Testet die Initialisierung mit Kreditlimite.
-     */
     @Test
-    public void testInit() {
-        SalaryAccount konto = new SalaryAccount("P-1000", -5000);
-        assertEquals("P-1000", konto.getId());
-        assertEquals(0, konto.getBalance());
-    }
-
-    /**
-     * Testet die Einzahlung auf ein Lohnkonto.
-     */
-    @Test
-    public void testDeposit() {
-        SalaryAccount konto = new SalaryAccount("P-1000", -5000);
-        assertTrue(konto.deposit(13576, 12000));
-        assertEquals(12000, konto.getBalance());
-    }
-
-    @Test
-    public void testWithdrawLimits() {
+    public void testSalaryAccountWithCreditLimit() {
+        // Lohnkonto mit Limite von -5000
         SalaryAccount account = new SalaryAccount("P-1000", -5000);
-        account.deposit(100, 1000);
-        
-        // abheben im rahmen der limite
-        assertTrue(account.withdraw(101, 4000));
-        assertEquals(-3000, account.getBalance());
-        
-        // zu viel abheben
-        assertFalse(account.withdraw(102, 3000)); 
+        assertEquals("P-1000", account.getId());
+        assertEquals(0, account.getBalance());
+
+        // Einzahlung
+        assertTrue(account.deposit(10, 2000));
+        assertEquals(2000, account.getBalance());
+
+        // Überziehen bis zur Kreditlimite ist erlaubt
+        assertTrue(account.withdraw(11, 6000));
+        assertEquals(-4000, account.getBalance());
+
+        // Mehr als die Kreditlimite überziehen wird abgelehnt
+        assertFalse(account.withdraw(12, 2000));
+        assertEquals(-4000, account.getBalance());
     }
 }

@@ -9,10 +9,22 @@ Untersuchung und Belastung des Spring Boot Backends unter hohem Datenverkehr (Tr
 
 | Tool | Typ / Interface | Stärken | Typischer Einsatzbereich |
 |------|-----------------|---------|--------------------------|
+| **Node.js Test Runner (`testing/run-load-tests.js`)** | Standalone Script | Führt automatisierte Verfügbarkeitsprüfungen, Lese-/Schreib-Lasttests und abschliessende Health Checks ohne externe Abhängigkeiten aus | Vollautomatisierte Last- und Verifikationstests |
 | **ApacheBench (`ab`)** | CLI Tool | Extrem schlank, standardmässig auf Unix/macOS vorinstalliert, minimale CPU-Overheads beim Erzeugen von Traffic | Schnelle Baseline-Messungen für statische oder REST-Endpunkte |
 | **Autocannon** | Node.js High-Performance Tool | Unterstützt HTTP/1.1 Pipelining, Verbindungs-Pooling, 100k+ req/s, detaillierte Latenz-Percentile (p50, p90, p99) | Lokale Stresstests & Microbenchmarks |
 | **Postman Collection Runner** | GUI & Newman CLI | Einfache Kombination von funktionalen API-Tests mit Wiederholungszyklen und Iterationen | Multi-User Workflow-Tests und funktionale Sequenzen |
 | **Apache JMeter** | Java GUI / Headless CLI | Umfassende Protokollunterstützung, Thread Groups, Timer, Ramp-up Profile, Assertion-Sammlungen | Komplexe Unternehmens-Lasttests |
+
+---
+
+## 2.1. Schnellstart: Automatisierter Test & Verifikation
+
+Das Skript `testing/run-load-tests.js` testet die Verfügbarkeit, führt 1'000 GET- und 500 POST-Anfragen unter paralleler Last aus, berechnet Latenz-Percentile (p50, p90, p99, max) und verifiziert abschliessend, ob das Backend stabil weiterläuft:
+
+```bash
+# Aus dem Projektverzeichnis automation-testing:
+node testing/run-load-tests.js
+```
 
 ---
 
