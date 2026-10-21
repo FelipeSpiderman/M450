@@ -116,13 +116,16 @@ Schlagen Tests fehl, wird nicht deployed.
 
 ## KI-Nutzung
 
-[Hier ehrlich festhalten, ob und wie KI verwendet wurde, z. B.:]
+KI wird für folgendes in diesem Projekt genutzt: 
 
-- Als Nachschlagewerk für Detailfragen: [ja / nein]
-- Code schreiben mit Autocomplete (z. B. Copilot): [ja / nein]
-- Code automatisch durch einen Agenten erstellen lassen: [ja / nein]
-- Reviewen oder Optimieren von bestehendem Code: [ja / nein]
-- Erstellen der Dokumentation: [ja / nein]
+- Advisor Guide
+    Wenn ich im Code nicht weiterkomme und ein Fehler meine Arbeit hindert, werde ich ihn nutzen damit ich das Problem lösen kann und er mir helfen kann aus diesem Fehler zu lernen.
+- Research
+    Herausfinden wie ich was genau im Projekt anwenden kann und sollte. Sei es bestimmte libraries oder andere Tools die ich nutzen kann. 
+- Hilfe mit der Google API
+    Da ich es zum ersten Mal nutze, weiss ich nicht exakt wie ich das machen kann, deswegen werde ich KI nutzen müssen um mir zu helfen wie ich diese Google API korrekt nutzen kann.  
+- Styling für das Frontend
+    Ich werde die Komponente und Html hauptsächlich selber schreiben, doch das Styling und formatting für das Frontend ist mir zu viel Aufwand und kostet mir viel Zeit. Deswegen werde ich Das Styling der KI überlassen, aber werde es so stylen damit es gut und minimalistisch bleibt. Ich möchte nicht dass das Styling mega gut und Krass aussieht, sondern dass es logisch und einfach für den User ist. 
 
 ## Installation und Start
 

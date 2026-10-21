@@ -2,7 +2,7 @@
 // and saves every raw response to samples/<name>.json.
 // Usage: node explore.mjs            (all endpoints)
 //        node explore.mjs sleep      (only endpoints whose name contains "sleep")
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { loadEnv, requireValue } from './env.mjs';
 
@@ -87,11 +87,22 @@ async function explore(endpoint) {
 
   const last = pages.at(-1);
   const result = {
+    fetchedAt: new Date().toISOString(),
+    range: { from: fromDate, to: toDate },
     request: { method: endpoint.method, path: endpoint.path, filter: filter ?? null, body: endpoint.body ?? null },
     status: last.status,
     pages: pages.map((p) => p.data),
   };
-  writeFileSync(`${SAMPLES_DIR}${endpoint.name}.json`, JSON.stringify(result, null, 2));
+  // A successful response replaces the old sample. A failed one goes to <name>.error.json,
+  // so an expired token or a 403 never overwrites a good sample from an earlier run.
+  const samplePath = `${SAMPLES_DIR}${endpoint.name}.json`;
+  const errorPath = `${SAMPLES_DIR}${endpoint.name}.error.json`;
+  if (last.status === 200) {
+    writeFileSync(samplePath, JSON.stringify(result, null, 2));
+    rmSync(errorPath, { force: true });
+  } else {
+    writeFileSync(errorPath, JSON.stringify(result, null, 2));
+  }
 
   const keys = last.data && typeof last.data === 'object' ? Object.keys(last.data).join(', ') : '-';
   const count = pages.reduce((sum, p) => sum + countItems(p.data), 0);
