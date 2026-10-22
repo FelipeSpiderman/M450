@@ -43,13 +43,14 @@ Die Applikation unterstützt drei Wege, um Daten zu erfassen:
 
 | Bereich | Technologie |
 |---|---|
-| Backend | Java, Spring Boot |
-| Frontend | React (Vite) |
+| Backend | Java 21, Spring Boot 4 |
+| Frontend | Angular 21 |
 | Datenbank | H2 (Tests), PostgreSQL (Betrieb) |
-| Build | Maven / Gradle |
-| Unit Tests | JUnit 5 |
+| Build | Maven, npm |
+| Unit Tests | JUnit 5 (Backend), Vitest (Frontend) |
 | Mocking | Mockito |
 | Integration Tests | Spring Boot Test |
+| E2E Tests | Playwright |
 | Code Coverage | JaCoCo, evtl. SonarQube / SonarCloud |
 | CI/CD | GitHub Actions |
 
@@ -132,17 +133,33 @@ KI wird für folgendes in diesem Projekt genutzt:
 ```bash
 # Repository klonen
 git clone https://github.com/FelipeSpiderman/M450
-cd M450/Projekt
+cd M450/Projekt/health-leveling
 
-# Backend starten
+# Optional: PostgreSQL starten (Standard ist H2 In-Memory)
+docker compose up -d
+
+# Backend starten (http://localhost:8080)
+cd backend
 ./mvnw spring-boot:run
+# mit PostgreSQL: ./mvnw spring-boot:run -Dspring-boot.run.profiles=postgres
 
 # Tests ausführen
 ./mvnw test
 
 # Coverage-Report erstellen (target/site/jacoco/index.html)
 ./mvnw verify
+
+# Frontend starten (http://localhost:4200)
+cd ../frontend
+npm install
+npm start
+
+# Frontend Unit Tests und E2E-Tests
+npm test -- --watch=false
+npm run test:e2e
 ```
+
+Voraussetzungen: JDK 21, Node 22, Docker (nur für PostgreSQL).
 
 ## Reflexion
 
