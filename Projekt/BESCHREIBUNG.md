@@ -131,8 +131,8 @@ KI wird für folgendes in diesem Projekt genutzt:
 
 ```bash
 # Repository klonen
-git clone [Repo-URL]
-cd health-leveling-system
+git clone https://github.com/FelipeSpiderman/M450
+cd M450/Projekt
 
 # Backend starten
 ./mvnw spring-boot:run
