@@ -1,45 +1,94 @@
-# Codereview – Zwei Personen, zwei Features
+# Codereview – Add Recipe und Edit Recipe
 
-Da die Aufgabe normalerweise zu zweit bearbeitet wird, werden hier zwei Personen simuliert.
-Beide setzen dieselben Features um – aber jede Person entwickelt ihre eigene, vollständige
-Lösung. Die Lösungen bauen nicht aufeinander auf und benötigen den Code der anderen Person
-nicht.
+**Team:** Person A und Person B (simuliert) · **Projekt:** Recipe Planner (Frontend + Backend)
 
-| Rolle | Aufgabe |
-|---|---|
-| **Person A** | Eigene Umsetzung von Feature 1 und Feature 2 |
-| **Person B** | Eigene, unabhängige Umsetzung von Feature 1 und Feature 2 |
-| **Review** | Die jeweils andere Person prüft den Pull Request |
+## Kurzfassung
 
-## Feature 1: Neues Rezept hinzufügen (Frontend)
-
-Jede Person implementiert das Feature im Frontend vollständig selbst:
-
-- Rezeptname, Beschreibung und Bild-URL können eingegeben werden.
-- Zutaten können hinzugefügt, bearbeitet und entfernt werden.
-- Pflichtfelder und Mengen werden validiert.
-- Das Rezept wird per `POST /api/recipes` an das Backend gesendet.
-- Lade-, Erfolgs- und Fehlerzustände werden angezeigt.
-
-**Person A** und **Person B** arbeiten dafür in getrennten Branches und erstellen je einen
-eigenen Pull Request. Keine der beiden Lösungen verändert oder benötigt die andere.
-
-## Feature 2: Rezept bearbeiten (Frontend und Backend)
-
-Jede Person implementiert das Feature im Frontend und im Backend vollständig selbst:
-
-- Backend: neuer Endpoint `PUT /api/recipes/{recipeId}` inklusive Fehlerbehandlung.
-- Frontend: Der Button "Edit Details" öffnet ein vorausgefülltes Formular.
-- Name, Beschreibung, Bild-URL und Zutaten können geändert werden.
-- Die Änderungen werden per `PUT` gespeichert und sind danach in der Übersicht sichtbar.
-- Ungültige IDs und fehlerhafte Eingaben werden verständlich gemeldet.
-
-**Person A** und **Person B** bauen jeweils ihre eigene Frontend- und Backend-Lösung, die
-zusammen funktioniert, ohne auf die Lösung der anderen Person angewiesen zu sein. Beide
-erstellen getrennte Pull Requests für Frontend und Backend.
+Beide Aufgaben wurden unabhängig umgesetzt, je per Pull Request eingereicht und gegenseitig
+reviewt. Aufgabe 1 betraf nur das Frontend, Aufgabe 2 zusätzlich das Backend. Beide Lösungen
+funktionieren, unterscheiden sich aber in Aufbau, Fehlerbehandlung und Validierung. Genau diese
+Unterschiede waren der interessanteste Teil der Reviews.
 
 ## Vorgehen
 
-Person A und Person B starten vom gleichen Stand. Zuerst wird Feature 1 von beiden
-unabhängig umgesetzt, gegenseitig reviewt und zusammengeführt. Danach folgt Feature 2
-auf dieselbe Weise, diesmal mit Frontend und Backend.
+- Gemeinsamer Startpunkt war `main`, jede Person arbeitete auf einem eigenen Branch.
+- Pro Feature ein Pull Request, bei Aufgabe 2 je einer für Frontend und Backend.
+- Review durch die andere Person mit den Inputs aus der Theorie: Lesbarkeit, Benennung,
+  Validierung, Fehlerfälle, Wiederverwendung und Tests.
+- Die Rückmeldungen wurden zuerst einzeln gesammelt, danach verglichen und diskutiert.
+- Gemergt wurde erst, nachdem die wichtigsten Punkte eingearbeitet waren.
+
+| Aufgabe | Person | Branch |
+|---|---|---|
+| 1 – Add Recipe | Person A | `feat/add-recipe-a` |
+| 2 – Edit Recipe | Person A | `feat2-a` |
+| 2 – Edit Recipe | Person B | `feat2-b` |
+
+## Aufgabe 1 – Neues Rezept hinzufügen (Frontend)
+
+Umgesetzt wurden ein Formular für Name, Beschreibung und Bild-URL, dynamische Zutatenzeilen
+sowie eine Validierung vor dem Absenden. Gespeichert wird über `POST /api/recipes`, mit
+Lade-, Erfolgs- und Fehlermeldungen.
+
+**Review-Fokus:** Formularzustand, Pflichtfelder, Zutatenmenge, Fehlermeldungen und das
+Verhalten nach dem Speichern.
+
+**Wichtigste Findings:**
+
+- Pflichtfelder und die Menge (ganze Zahl grösser als 0) müssen geprüft werden, bevor gesendet wird.
+- Eine leere Zutatenliste darf nicht abgeschickt werden.
+- Nach dem Speichern braucht es eine klare Rückmeldung, sonst wird doppelt abgeschickt.
+- Zutatenzeilen brauchen stabile Keys, sonst springen die Eingaben beim Löschen.
+
+## Aufgabe 2 – Rezept bearbeiten (Frontend und Backend)
+
+Beide Personen haben Frontend und Backend selbst umgesetzt. Der API-Vertrag war vorab
+abgesprochen: `PUT /api/recipes/{recipeId}` gibt das aktualisierte Rezept zurück, `404` bei
+unbekannter ID und `400` bei leerem Namen.
+
+| Aspekt | Person A | Person B |
+|---|---|---|
+| Einstieg | eigene Seite `/recipes/:recipeId/edit` | Modal direkt auf der Übersicht |
+| HTTP-Client | `axios` | `fetch` |
+| Formularzustand | verteilte States, eigene Zutaten-Komponente | ein `formData`-Objekt, zentrale Validierung |
+| Backend-Fehler | `ResponseStatusException` im Service | `Optional<Recipe>` und `ResponseEntity` im Controller |
+| Nach dem Speichern | Erfolgsmeldung mit Link zur Übersicht | Modal schliesst, Liste wird direkt aktualisiert |
+| Tests | Controller- und Service-Tests | gleiche Fälle, anderer Rückgabetyp |
+
+**Review-Fokus:** Fehlerbehandlung bei `404` und `400`, doppelte Validierung, Umgang mit
+Nebenwirkungen und die Frage, wo Logik hingehört.
+
+**Wichtigste Findings:**
+
+- `404` und `400` müssen getrennt behandelt und im Frontend verständlich angezeigt werden.
+- Validierung im Frontend ist Komfort, die Wahrheit liegt im Backend.
+- Der Controller soll keine Geschäftslogik enthalten – nur HTTP und Statuscodes.
+- Beim Speichern muss der Button gesperrt werden, sonst sind Doppelklicks möglich.
+- Beide Varianten nutzen dieselbe API und sind deshalb austauschbar.
+
+## Vergleich der Review-Inputs
+
+Die Rückmeldungen deckten sich bei den Basics: Validierung, Fehlerfälle, Tests und Lesbarkeit.
+Unterschiedlich beurteilt wurden die Architekturfragen. Person A bevorzugte eine eigene Seite,
+weil sie verlinkbar und besser testbar ist. Person B bevorzugte das Modal, weil der Kontext der
+Übersicht erhalten bleibt und weniger Navigation nötig ist. Beim Backend war die Diskussion
+ähnlich: Exceptions sind kürzer und Spring-typisch, `Optional` macht die mögliche Abwesenheit
+explizit. Beide Ansätze sind vertretbar – entscheidend ist, dass sie konsequent umgesetzt und
+getestet sind.
+
+## Erkenntnisse
+
+1. **API-Vertrag zuerst festlegen.** Dann bleiben zwei unabhängige Lösungen kompatibel.
+2. **Fehlerfälle früh durchdenken.** `404`, `400` und leere Eingaben fallen sonst erst beim Testen auf.
+3. **Klein und klar schneiden.** Kleine Komponenten und ein Pull Request pro Thema erleichtern das Review.
+4. **Theorie-Inputs helfen.** Struktur statt Geschmack kommentieren führt zu besseren Diskussionen.
+5. **Geteilte Dateien sind Konfliktpunkte.** `Browse`, `Recipe`, Controller und Service früh absprechen.
+6. **Tests zeigen Denkweisen.** Gleiche Testfälle bei beiden Varianten machen Unterschiede sichtbar.
+7. **Beide Wege dürfen bestehen.** Die Diskussion war wertvoller als eine erzwungene einheitliche Lösung.
+
+## Hinweis zum Stand im Repository
+
+Aufgabe 1 liegt als Umsetzung von Person A auf `feat/add-recipe-a` vor; eine separate
+Umsetzung von Person B wurde für dieses Feature nicht abgelegt. Der Review dazu fand direkt
+am Pull Request von Person A statt. Aufgabe 2 ist mit beiden Varianten vorhanden (`feat2-a`
+und `feat2-b`). Backend-Tests: 18 erfolgreich, Frontend-Build erfolgreich.
