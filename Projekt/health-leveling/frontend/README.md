@@ -21,6 +21,7 @@ npm run build                 # Production Build
 npx playwright install chromium
 sudo npx playwright install-deps chromium
 npm run test:e2e              # startet ng serve automatisch
+E2E_PORT=4300 npm run test:e2e  # falls Port 4200 schon belegt ist
 npx playwright show-report    # HTML-Report
 ```
 
@@ -47,3 +48,48 @@ Alle Eingaben werden bereits im Frontend validiert, bevor sie an das Backend ges
 2. Ungültige Einträge erreichen das Backend gar nicht erst.
 
 Das Backend validiert die Daten trotzdem ein zweites Mal, da es sich nicht allein auf das Frontend verlassen darf.
+
+## Umsetzung
+
+### Seiten
+
+| Seite | Pfad | Inhalt |
+|---|---|---|
+| Profil | `/` | Level, XP, Fortschrittsbalken, Schritte-Serie und Achievements |
+| Erfassen | `/erfassen` | Formular für Aktivität, Mahlzeit, Getränk und Gewicht, Liste der Einträge eines Tages |
+| Tage | `/tage` | Schritte und Schlaf-Score manuell erfassen, Übersicht aller Tage |
+| Import | `/import` | CSV- oder JSON-Datei importieren, Google Health synchronisieren |
+
+### Aufbau
+
+```
+src/app/
+├── core/            ApiService (einziger Zugriff aufs Backend), Modelle, Validatoren, Fehlermeldungen
+├── profile/         Profil-Seite
+├── entries/         Erfassen-Seite
+├── days/            Tage-Seite
+└── import/          Import-Seite
+```
+
+Jede Seite ist eine Standalone-Komponente mit Signals für den Zustand und Reactive Forms für die Eingaben. Das Styling liegt gesammelt in `src/styles.scss`.
+
+### Unabhängig vom Backend
+
+- Alle Anfragen laufen über den `ApiService`. Nur dort stehen die URLs.
+- Ist das Backend nicht erreichbar, zeigt jede Seite eine verständliche Meldung statt eines Fehlers.
+- Die Unit Tests ersetzen den `ApiService` durch Mocks bzw. das HTTP durch `HttpTestingController`.
+- Die E2E-Tests beantworten alle `/api`-Anfragen direkt im Browser (`page.route`). Es braucht also kein laufendes Backend und keine echten Daten.
+
+### Validierung
+
+Die Grenzen sind dieselben wie im Backend:
+
+| Feld | Regel |
+|---|---|
+| Zeitpunkt / Datum | Pflicht, nicht in der Zukunft |
+| Aktivität | Bezeichnung und Dauer (1–1440 Min.) Pflicht, Kalorien optional (0–5000) |
+| Mahlzeit | Kalorien Pflicht (0–5000) |
+| Getränk | Menge Pflicht (1–5000 ml) |
+| Gewicht | Pflicht (20–400 kg) |
+| Tageswerte | Schritte (0–100'000) oder Schlaf-Score (0–100), mindestens eines davon |
+
