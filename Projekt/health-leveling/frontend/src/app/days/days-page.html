@@ -44,6 +44,12 @@
 </section>
 
 <section class="card">
+  <h2>Verlauf</h2>
+  <p class="muted">XP pro Tag in den letzten 14 Tagen</p>
+  <app-xp-chart [days]="days()" />
+</section>
+
+<section class="card">
   <h2>Übersicht</h2>
   @if (days().length === 0) {
     <p class="muted">Noch keine Daten erfasst.</p>

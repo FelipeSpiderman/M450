@@ -1,0 +1,44 @@
+<div class="chart" role="group" aria-label="XP pro Tag in den letzten 14 Tagen">
+  <div class="chart-plot">
+    @for (tick of chart().ticks; track tick.value) {
+      <div class="chart-grid" [class.zero]="tick.value === 0" [style.bottom.%]="tick.position">
+        <span>{{ tick.value }}</span>
+      </div>
+    }
+
+    <div class="chart-columns">
+      @for (bar of chart().bars; track bar.date; let index = $index) {
+        <!-- the whole column is the hover target, not only the bar -->
+        <div
+          class="chart-column"
+          tabindex="0"
+          [attr.aria-label]="describe(bar)"
+          (mouseenter)="active.set(bar)"
+          (mouseleave)="active.set(null)"
+          (focus)="active.set(bar)"
+          (blur)="active.set(null)"
+        >
+          @if (bar.xp) {
+            <div
+              class="chart-bar"
+              [class.negative]="bar.xp < 0"
+              [style.bottom.%]="bar.bottom"
+              [style.height.%]="bar.height"
+            ></div>
+          }
+          @if (active() === bar) {
+            <div class="chart-tooltip" [class.align-end]="index > 10">
+              {{ bar.label }} {{ bar.xp === null ? 'keine Daten' : bar.xp + ' XP' }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="chart-labels" aria-hidden="true">
+    @for (bar of chart().bars; track bar.date) {
+      <span>{{ bar.label }}</span>
+    }
+  </div>
+</div>

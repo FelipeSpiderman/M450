@@ -57,7 +57,7 @@ Das Backend validiert die Daten trotzdem ein zweites Mal, da es sich nicht allei
 |---|---|---|
 | Profil | `/` | Level, XP, Fortschrittsbalken, Schritte-Serie und Achievements |
 | Erfassen | `/erfassen` | Formular für Aktivität, Mahlzeit, Getränk und Gewicht, Liste der Einträge eines Tages |
-| Tage | `/tage` | Schritte und Schlaf-Score manuell erfassen, Übersicht aller Tage |
+| Tage | `/tage` | Schritte und Schlaf-Score manuell erfassen, Diagramm der XP der letzten 14 Tage, Übersicht aller Tage |
 | Import | `/import` | CSV- oder JSON-Datei importieren, Google Health synchronisieren |
 
 ### Aufbau
@@ -70,6 +70,8 @@ src/app/
 ├── days/            Tage-Seite
 └── import/          Import-Seite
 ```
+
+Das Diagramm (`days/xp-chart.ts`) ist ohne Bibliothek mit HTML und CSS gebaut. Beim Darüberfahren oder per Tastatur (Tab) wird der Wert eines Tages angezeigt. Dieselben Werte stehen auch in der Tabelle darunter.
 
 Jede Seite ist eine Standalone-Komponente mit Signals für den Zustand und Reactive Forms für die Eingaben. Das Styling liegt gesammelt in `src/styles.scss`.
 

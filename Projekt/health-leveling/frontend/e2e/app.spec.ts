@@ -17,6 +17,11 @@ const achievements = [
   { achievement: 'LEVEL_5', title: 'Rising star', description: 'Reach level 5', unlocked: false },
 ];
 
+function today(): string {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().substring(0, 10);
+}
+
 /** Fake backend. Returns the bodies of all POST requests so the tests can check them. */
 async function mockApi(page: Page): Promise<unknown[]> {
   const posted: unknown[] = [];
@@ -94,6 +99,25 @@ test('invalid input is explained and not sent', async ({ page }) => {
 
   await expect(page.getByText('Höchstens 400.')).toBeVisible();
   expect(posted).toHaveLength(0);
+});
+
+test('the days page shows the XP history as a chart', async ({ page }) => {
+  await mockApi(page);
+  await page.route('**/api/days', (route) =>
+    route.fulfill({
+      json: [
+        { date: today(), steps: 12000, sleepScore: 80, activityCount: null, activityMinutes: null,
+          entries: [], valuesXp: 130, entriesXp: 0, slotBonus: 0, caloriePenalty: 0, totalXp: 130 },
+      ],
+    }),
+  );
+  await page.goto('/tage');
+
+  await expect(page.locator('.chart-column')).toHaveCount(14);
+  await expect(page.locator('.chart-bar')).toHaveCount(1);
+  await page.locator('.chart-column').last().hover();
+  await expect(page.locator('.chart-tooltip')).toHaveText(/130 XP/);
+  await expect(page.locator('tbody tr')).toHaveCount(1);
 });
 
 test('a CSV file can be imported', async ({ page }) => {

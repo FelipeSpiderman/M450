@@ -6,10 +6,11 @@ import { today } from '../core/dates';
 import { errorMessage, fieldError } from '../core/messages';
 import { Day } from '../core/models';
 import { atLeastOne, notInFuture } from '../core/validators';
+import { XpChart } from './xp-chart';
 
 @Component({
   selector: 'app-days-page',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, XpChart],
   templateUrl: './days-page.html',
 })
 export class DaysPage implements OnInit {
