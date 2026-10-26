@@ -1,7 +1,6 @@
 import './Recipe.css'
 import {Button, Card } from "react-bootstrap";
 import React from "react";
-import {Link} from "react-router-dom";
 function Recipe(props) {
     return (
     <Card style={{ width: '18rem' }}>
@@ -9,7 +8,7 @@ function Recipe(props) {
         <Card.Body>
             <Card.Title>{props.title}</Card.Title>
             {props.description}
-            <Button as={Link} to={`/recipes/${props.id}/edit`} variant="primary">Edit Details</Button>
+            <Button variant="primary" onClick={props.onEdit}>Edit Details</Button>
         </Card.Body>
     </Card>
     )
