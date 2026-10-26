@@ -4,7 +4,9 @@ import ch.tbz.recipe.planner.entities.RecipeEntity;
 import ch.tbz.recipe.planner.mapper.RecipeEntityMapper;
 import ch.tbz.recipe.planner.repository.RecipeRepository;
 import ch.tbz.recipe.planner.domain.Recipe;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,5 +35,18 @@ public class RecipeService {
     public Recipe addRecipe(Recipe recipe) {
         var createdRecipe = repository.save(mapper.domainToEntity(recipe));
         return mapper.entityToDomain(createdRecipe);
+    }
+
+    public Recipe updateRecipe(UUID recipeId, Recipe recipe) {
+        if (recipe.getName() == null || recipe.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Recipe name must not be empty");
+        }
+
+        repository.findById(recipeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+
+        recipe.setId(recipeId);
+        var updatedRecipe = repository.save(mapper.domainToEntity(recipe));
+        return mapper.entityToDomain(updatedRecipe);
     }
 }
