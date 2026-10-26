@@ -183,6 +183,9 @@ Interval data (steps, exercise, sleep, …):
 GET /users/me/dataTypes/steps/dataPoints?filter=steps.interval.civil_start_time >= "2026-10-01T00:00:00"
 ```
 
+> ⚠️ `sleep` does **not** support `civil_start_time` (400 `INVALID_DATA_POINT_FILTER`). Use the end time in UTC instead:
+> `sleep.interval.end_time >= "2026-10-01T00:00:00Z"` (tested against the real API).
+
 Sample data (weight, body fat, heart rate, …):
 
 ```

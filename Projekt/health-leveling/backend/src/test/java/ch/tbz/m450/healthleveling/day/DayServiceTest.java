@@ -100,16 +100,6 @@ class DayServiceTest {
 
         assertThat(days).extracting(DayDetail::date).containsExactly(DAY, dayBefore);
         assertThat(days).extracting(DayDetail::totalXp).containsExactly(10, 40);
-        assertThat(service.totalXp()).isEqualTo(50);
-    }
-
-    @Test
-    void totalXp_neverNegative() {
-        when(recordRepository.findAll()).thenReturn(List.of());
-        // one huge meal: 10 XP - 20 penalty
-        when(entryRepository.findAll()).thenReturn(List.of(meal(8, 4000)));
-
-        assertThat(service.totalXp()).isZero();
     }
 
     private DailyRecord record(LocalDate date, Integer steps, Integer sleepScore) {

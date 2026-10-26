@@ -61,7 +61,8 @@ Die Google-Health-App erfasst gewisse Werte automatisch, zum Beispiel Schritte o
 
 | Methode | Pfad | Zweck |
 |---|---|---|
-| GET | `/api/profile` | Level, XP und Fortschritt in Prozent |
+| GET | `/api/profile` | Level, XP, Fortschritt in Prozent und aktuelle Schritte-Serie (Streak) |
+| GET | `/api/achievements` | Alle Achievements mit Status (freigeschaltet oder nicht) |
 | GET | `/api/days` | Alle Tage mit Werten, Einträgen und XP, neuester zuerst |
 | GET | `/api/days/{datum}` | Ein Tag mit Werten, Einträgen und XP-Aufschlüsselung |
 | POST | `/api/days` | Tageswerte manuell erfassen (`date`, `steps`, `sleepScore`, `activityCount`, `activityMinutes`) |
@@ -86,6 +87,22 @@ Fehler werden als JSON mit `status` und `detail` zurückgegeben: 400 bei ungült
 | Gewicht | 5 |
 | Tagesrückblick | Einträge in 2 Tageszeiten +10, in allen 3 +30 (Morgen 05–11, Mittag 11–17, Abend 17–23 Uhr) |
 | Zu viel gegessen | −20, wenn die Kalorien der Mahlzeiten > 2500 + verbrannte Kalorien der Aktivitäten |
+| Streak | +50 an jedem 7. Tag in Folge mit mindestens 10'000 Schritten (Tag 7, 14, 21 …) |
+
+Die aktuelle Streak zählt bis heute. Ist das Ziel heute noch nicht erreicht, zählt sie bis gestern, damit sie nicht schon am Morgen verloren geht.
+
+### Achievements
+
+| Achievement | Bedingung |
+|---|---|
+| `FIRST_ENTRY` | Erster Eintrag erfasst |
+| `STEP_GOAL` | An einem Tag 10'000 Schritte |
+| `GOOD_SLEEP` | Schlaf-Score von mindestens 90 |
+| `FULL_DAY` | Einträge am Morgen, Mittag und Abend desselben Tages |
+| `WEEK_STREAK` | 7 Tage in Folge 10'000 Schritte |
+| `LEVEL_5` | Level 5 erreicht |
+
+Achievements werden wie XP und Level bei jeder Abfrage berechnet und nicht gespeichert.
 
 **Level:** Von Level n auf n+1 braucht es `100 × n` XP (Level 2 ab 100 XP, Level 3 ab 300, Level 4 ab 600 …). Die Gesamt-XP fallen nie unter 0.
 
@@ -103,4 +120,6 @@ Leere Werte bleiben leer (0 Schritte ≠ keine Daten). Ein bereits vorhandener T
 
 ### Google Health
 
-Die Zugangsdaten werden als Umgebungsvariablen gesetzt: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` (Refresh Token z. B. mit `Projekt/api-explorer/get-token.mjs` holen). Abgerufen werden Schritte und Schlaf. Da die API keinen Schlaf-Score liefert, wird er aus der Schlafdauer geschätzt: Minuten geschlafen / 480 × 100, max. 100.
+Die Zugangsdaten werden als Umgebungsvariablen gesetzt: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` (Refresh Token z. B. mit `Projekt/api-explorer/get-token.mjs` holen). Abgerufen werden Schritte, Schlaf und Trainings (Anzahl und aktive Minuten pro Tag). Da die API keinen Schlaf-Score liefert, wird er aus der Schlafdauer geschätzt: Minuten geschlafen / 480 × 100, max. 100.
+
+Synchronisiert wird manuell über `POST /api/sync` und automatisch alle 3 Stunden (die letzten 7 Tage). Der Zeitplan lässt sich mit `google.health.sync-cron` ändern. Ohne Zugangsdaten wird die automatische Synchronisation übersprungen.

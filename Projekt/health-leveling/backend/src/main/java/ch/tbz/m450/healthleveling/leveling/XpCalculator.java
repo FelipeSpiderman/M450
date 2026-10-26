@@ -7,12 +7,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class XpCalculator {
 
+    public static final int STEP_GOAL = 10000;
+
     private static final int MAX_ACTIVITY_MINUTES = 120;
     private static final int ACTIVITY_BASE_XP = 10;
 
     public int stepsXp(int steps) {
         int xp = Math.min(steps, 20000) / 1000 * 5;
-        return steps >= 10000 ? xp + 20 : xp;
+        return steps >= STEP_GOAL ? xp + 20 : xp;
     }
 
     public int sleepXp(int sleepScore) {

@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.databind.JsonNode;
 
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -19,8 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
-/** Reads steps and sleep from the Google Health API (see Projekt/ENDPOINTS.md). */
+/** Reads steps, sleep and workouts from the Google Health API (see Projekt/ENDPOINTS.md). */
 @Component
 public class GoogleHealthClient implements HealthDataClient {
 
@@ -59,12 +61,17 @@ public class GoogleHealthClient implements HealthDataClient {
             String token = fetchAccessToken();
             Map<LocalDate, Integer> steps = fetchSteps(token, from, to);
             Map<LocalDate, Integer> sleep = fetchSleepScores(token, from);
+            Map<LocalDate, Integer> activityCount = new HashMap<>();
+            Map<LocalDate, Long> activitySeconds = new HashMap<>();
+            fetchExercises(token, from, activityCount, activitySeconds);
 
             TreeSet<LocalDate> dates = new TreeSet<>(steps.keySet());
             dates.addAll(sleep.keySet());
+            dates.addAll(activityCount.keySet());
             return dates.stream()
                     .filter(date -> !date.isBefore(from) && !date.isAfter(to))
-                    .map(date -> new DailyValues(date, steps.get(date), sleep.get(date), null, null))
+                    .map(date -> new DailyValues(date, steps.get(date), sleep.get(date),
+                            activityCount.get(date), toMinutes(activitySeconds.get(date))))
                     .toList();
         } catch (RestClientException e) {
             throw new HealthApiException("Google Health API request failed: " + e.getMessage());
@@ -109,37 +116,53 @@ public class GoogleHealthClient implements HealthDataClient {
      * minutes asleep compared to an 8 hour goal, max 100.
      */
     private Map<LocalDate, Integer> fetchSleepScores(String token, LocalDate from) {
-        // start one day earlier: a night that starts the evening before "from" ends on "from"
-        String filter = "sleep.interval.civil_start_time >= \"" + from.minusDays(1) + "T00:00:00\"";
+        // sleep can only be filtered by end time in UTC; one day earlier so no night is missed
+        String filter = "sleep.interval.end_time >= \"" + from.minusDays(1) + "T00:00:00Z\"";
         Map<LocalDate, Integer> scores = new HashMap<>();
+        forEachDataPoint(token, "sleep", filter, sleep -> {
+            if (sleep.path("metadata").path("mainSleep").asBoolean(false)) { // naps don't count
+                int minutesAsleep = sleep.path("summary").path("minutesAsleep").asInt(0);
+                int score = Math.min(100, minutesAsleep * 100 / SLEEP_GOAL_MINUTES);
+                scores.merge(localDate(sleep.path("interval"), "end"), score, Math::max);
+            }
+        });
+        return scores;
+    }
+
+    private void fetchExercises(String token, LocalDate from,
+                                Map<LocalDate, Integer> count, Map<LocalDate, Long> seconds) {
+        String filter = "exercise.interval.civil_start_time >= \"" + from + "T00:00:00\"";
+        forEachDataPoint(token, "exercise", filter, exercise -> {
+            LocalDate day = localDate(exercise.path("interval"), "start");
+            count.merge(day, 1, Integer::sum);
+            seconds.merge(day, toSeconds(exercise.path("activeDuration").asString("0s")), Long::sum);
+        });
+    }
+
+    /** Reads all pages of a data type and passes every data point to the action. */
+    private void forEachDataPoint(String token, String type, String filter, Consumer<JsonNode> action) {
         String pageToken = "";
 
         for (int page = 0; page < MAX_PAGES; page++) {
             JsonNode response = restClient.get()
-                    .uri(sleepUri(filter, pageToken))
+                    .uri(reconcileUri(type, filter, pageToken))
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .body(JsonNode.class);
 
             for (JsonNode point : response.path("dataPoints")) {
-                JsonNode sleep = point.path("sleep");
-                if (sleep.path("metadata").path("mainSleep").asBoolean(false)) { // naps don't count
-                    int minutesAsleep = sleep.path("summary").path("minutesAsleep").asInt(0);
-                    int score = Math.min(100, minutesAsleep * 100 / SLEEP_GOAL_MINUTES);
-                    scores.merge(localWakeUpDate(sleep.path("interval")), score, Math::max);
-                }
+                action.accept(point.path(type));
             }
             pageToken = response.path("nextPageToken").asString("");
             if (pageToken.isEmpty()) {
-                break;
+                return;
             }
         }
-        return scores;
     }
 
-    private URI sleepUri(String filter, String pageToken) {
+    private URI reconcileUri(String type, String filter, String pageToken) {
         UriComponentsBuilder builder = UriComponentsBuilder
-                .fromUriString(BASE_URL + "/sleep/dataPoints:reconcile")
+                .fromUriString(BASE_URL + "/" + type + "/dataPoints:reconcile")
                 .queryParam("filter", "{filter}");
         if (!pageToken.isEmpty()) {
             builder.queryParam("pageToken", "{pageToken}");
@@ -147,11 +170,20 @@ public class GoogleHealthClient implements HealthDataClient {
         return builder.encode().buildAndExpand(filter, pageToken).toUri();
     }
 
-    // endTime is UTC, endUtcOffset looks like "7200s" -> local date of waking up
-    private LocalDate localWakeUpDate(JsonNode interval) {
-        Instant end = Instant.parse(interval.path("endTime").asString());
-        int offsetSeconds = Integer.parseInt(interval.path("endUtcOffset").asString("0s").replace("s", ""));
-        return end.atOffset(ZoneOffset.ofTotalSeconds(offsetSeconds)).toLocalDate();
+    // times are UTC, the offset ("7200s") gives the local date, e.g. of waking up ("end")
+    private LocalDate localDate(JsonNode interval, String startOrEnd) {
+        Instant time = Instant.parse(interval.path(startOrEnd + "Time").asString());
+        long offset = toSeconds(interval.path(startOrEnd + "UtcOffset").asString("0s"));
+        return time.atOffset(ZoneOffset.ofTotalSeconds((int) offset)).toLocalDate();
+    }
+
+    private Integer toMinutes(Long seconds) {
+        return seconds == null ? null : Math.round(seconds / 60f);
+    }
+
+    // Google sends durations like "1230s"
+    private long toSeconds(String duration) {
+        return Duration.parse("PT" + duration.toUpperCase()).toSeconds();
     }
 
     private Map<String, Object> civilDate(LocalDate date) {

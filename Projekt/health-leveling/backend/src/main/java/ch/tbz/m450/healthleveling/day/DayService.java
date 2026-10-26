@@ -68,11 +68,6 @@ public class DayService {
                 .toList();
     }
 
-    /** XP of all days together, never below 0. */
-    public int totalXp() {
-        return Math.max(0, getDays().stream().mapToInt(DayDetail::totalXp).sum());
-    }
-
     private DayDetail buildDay(LocalDate date, DailyRecord record, List<Entry> entries) {
         // an empty record keeps the code below free of null checks
         DailyRecord values = record != null ? record : new DailyRecord(date);

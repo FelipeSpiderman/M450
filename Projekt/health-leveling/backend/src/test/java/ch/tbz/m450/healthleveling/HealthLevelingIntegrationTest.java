@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -87,6 +88,25 @@ class HealthLevelingIntegrationTest {
         mockMvc.perform(get("/api/days"))
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].date").value("2026-10-07"));
+    }
+
+    @Test
+    void stepStreakAndAchievements() throws Exception {
+        LocalDate today = LocalDate.now();
+        for (int i = 0; i < 7; i++) {
+            postDay("{\"date\": \"" + today.minusDays(i) + "\", \"steps\": 10000}").andExpect(status().isOk());
+        }
+
+        // 7 days * 70 XP + 50 streak bonus
+        mockMvc.perform(get("/api/profile"))
+                .andExpect(jsonPath("$.totalXp").value(540))
+                .andExpect(jsonPath("$.currentStreak").value(7));
+
+        mockMvc.perform(get("/api/achievements"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(6))
+                .andExpect(jsonPath("$[?(@.achievement == 'WEEK_STREAK')].unlocked").value(true))
+                .andExpect(jsonPath("$[?(@.achievement == 'FIRST_ENTRY')].unlocked").value(false));
     }
 
     @Test

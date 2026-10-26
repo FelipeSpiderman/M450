@@ -11,6 +11,8 @@ import java.util.List;
 @Component
 public class DayReview {
 
+    public static final int FULL_DAY_BONUS = 30;
+
     private static final LocalTime MORNING_START = LocalTime.of(5, 0);
     private static final LocalTime MIDDAY_START = LocalTime.of(11, 0);
     private static final LocalTime EVENING_START = LocalTime.of(17, 0);
@@ -39,7 +41,7 @@ public class DayReview {
                 .distinct()
                 .count();
         if (slots == 3) {
-            return 30;
+            return FULL_DAY_BONUS;
         }
         if (slots == 2) {
             return 10;

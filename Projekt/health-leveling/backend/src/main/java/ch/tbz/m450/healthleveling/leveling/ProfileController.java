@@ -1,23 +1,26 @@
 package ch.tbz.m450.healthleveling.leveling;
 
-import ch.tbz.m450.healthleveling.day.DayService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** The profile is not stored: level and XP are always calculated from the saved days. */
+import java.util.List;
+
 @RestController
 public class ProfileController {
 
-    private final DayService dayService;
-    private final LevelCalculator levelCalculator;
+    private final ProfileService profileService;
 
-    public ProfileController(DayService dayService, LevelCalculator levelCalculator) {
-        this.dayService = dayService;
-        this.levelCalculator = levelCalculator;
+    public ProfileController(ProfileService profileService) {
+        this.profileService = profileService;
     }
 
     @GetMapping("/api/profile")
-    public LevelProgress getProfile() {
-        return levelCalculator.progress(dayService.totalXp());
+    public ProfileResponse getProfile() {
+        return profileService.getProfile();
+    }
+
+    @GetMapping("/api/achievements")
+    public List<AchievementStatus> getAchievements() {
+        return profileService.getAchievements();
     }
 }

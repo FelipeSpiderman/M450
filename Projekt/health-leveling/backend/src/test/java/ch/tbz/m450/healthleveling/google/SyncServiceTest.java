@@ -13,7 +13,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -66,5 +68,24 @@ class SyncServiceTest {
         assertThatThrownBy(() -> service.sync(FROM, TO))
                 .isInstanceOf(HealthApiException.class);
         verifyNoInteractions(dayService);
+    }
+
+    @Test
+    void scheduledSync_syncsTheLastSevenDays() {
+        LocalDate today = LocalDate.now();
+        when(client.fetchDays(today.minusDays(6), today)).thenReturn(List.of());
+        when(dayService.saveAll(List.of())).thenReturn(new ImportResult(0, 0));
+
+        service.scheduledSync();
+
+        verify(dayService).saveAll(List.of());
+    }
+
+    @Test
+    void scheduledSync_apiNotAvailable_doesNotThrow() {
+        LocalDate today = LocalDate.now();
+        when(client.fetchDays(today.minusDays(6), today)).thenThrow(new HealthApiException("not configured"));
+
+        assertThatNoException().isThrownBy(() -> service.scheduledSync());
     }
 }

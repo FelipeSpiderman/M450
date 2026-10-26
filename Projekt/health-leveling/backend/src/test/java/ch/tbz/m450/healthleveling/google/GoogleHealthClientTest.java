@@ -51,18 +51,25 @@ class GoogleHealthClientTest {
                 .andExpect(jsonPath("$.range.start.date.day").value(4))
                 .andExpect(jsonPath("$.range.end.date.day").value(7))
                 .andRespond(json("steps-daily.json"));
+        // Google only accepts end_time (UTC) as filter for sleep, verified against the real API
         server.expect(requestTo(startsWith(GoogleHealthClient.BASE_URL + "/sleep/dataPoints:reconcile")))
                 .andExpect(method(HttpMethod.GET))
+                .andExpect(requestTo(containsString("sleep.interval.end_time")))
                 .andRespond(json("sleep-page1.json"));
         server.expect(requestTo(containsString("pageToken=page-2")))
                 .andRespond(json("sleep-page2.json"));
+        server.expect(requestTo(startsWith(GoogleHealthClient.BASE_URL + "/exercise/dataPoints:reconcile")))
+                .andExpect(requestTo(containsString("exercise.interval.civil_start_time")))
+                .andRespond(json("exercise.json"));
 
         List<DailyValues> days = client.fetchDays(FROM, TO);
 
-        // 432 min of 480 = 90, 540 min is capped at 100, the nap is ignored
+        // sleep: 432 min of 480 = 90, 540 min is capped at 100, the nap is ignored
+        // exercise: 2026-10-06 has 30 + 21 min, the bike ride at 23:30 local time counts for 2026-10-04
         assertThat(days).containsExactly(
+                new DailyValues(LocalDate.of(2026, 10, 4), null, null, 1, 45),
                 new DailyValues(LocalDate.of(2026, 10, 5), 4810, 100, null, null),
-                new DailyValues(LocalDate.of(2026, 10, 6), 12034, 90, null, null));
+                new DailyValues(LocalDate.of(2026, 10, 6), 12034, 90, 2, 51));
         server.verify();
     }
 
@@ -74,6 +81,8 @@ class GoogleHealthClientTest {
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(startsWith(GoogleHealthClient.BASE_URL + "/sleep/dataPoints:reconcile")))
                 .andRespond(json("sleep-after-midnight.json"));
+        server.expect(requestTo(startsWith(GoogleHealthClient.BASE_URL + "/exercise/dataPoints:reconcile")))
+                .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         List<DailyValues> days = client.fetchDays(FROM, TO);
 
