@@ -8,7 +8,7 @@ function Recipe(props) {
         <Card.Body>
             <Card.Title>{props.title}</Card.Title>
             {props.description}
-            <Button variant="primary">Edit Details</Button>
+            <Button variant="primary" onClick={props.onEdit}>Edit Details</Button>
         </Card.Body>
     </Card>
     )
