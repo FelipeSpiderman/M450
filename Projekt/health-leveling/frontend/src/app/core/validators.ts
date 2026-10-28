@@ -21,3 +21,12 @@ export function atLeastOne(...fields: string[]): ValidatorFn {
     return filled ? null : { atLeastOne: true };
   };
 }
+
+/** Only whole numbers, e.g. no 1000.5 steps. Empty values are allowed. */
+export const wholeNumber: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const value = control.value;
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  return Number.isInteger(value) ? null : { wholeNumber: true };
+};

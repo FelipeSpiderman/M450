@@ -12,6 +12,7 @@ export function fieldError(control: AbstractControl | null): string | null {
   if (errors['max']) return `Höchstens ${errors['max'].max}.`;
   if (errors['maxlength']) return `Höchstens ${errors['maxlength'].requiredLength} Zeichen.`;
   if (errors['future']) return 'Darf nicht in der Zukunft liegen.';
+  if (errors['wholeNumber']) return 'Bitte eine ganze Zahl eingeben.';
   return 'Ungültiger Wert.';
 }
 

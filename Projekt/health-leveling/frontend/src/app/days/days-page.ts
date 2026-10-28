@@ -5,7 +5,7 @@ import { ApiService } from '../core/api.service';
 import { today } from '../core/dates';
 import { errorMessage, fieldError } from '../core/messages';
 import { Day } from '../core/models';
-import { atLeastOne, notInFuture } from '../core/validators';
+import { atLeastOne, notInFuture, wholeNumber } from '../core/validators';
 import { XpChart } from './xp-chart';
 
 @Component({
@@ -24,8 +24,8 @@ export class DaysPage implements OnInit {
   protected readonly form = new FormGroup(
     {
       date: new FormControl(today(), { nonNullable: true, validators: [Validators.required, notInFuture] }),
-      steps: new FormControl<number | null>(null, [Validators.min(0), Validators.max(100000)]),
-      sleepScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(100)]),
+      steps: new FormControl<number | null>(null, [Validators.min(0), Validators.max(100000), wholeNumber]),
+      sleepScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(100), wholeNumber]),
     },
     { validators: atLeastOne('steps', 'sleepScore') },
   );
@@ -54,6 +54,18 @@ export class DaysPage implements OnInit {
           this.message.set(null);
         },
       });
+  }
+
+  /** Explains the bonus and penalty of the day review, e.g. "+30 Tagesbonus". */
+  protected breakdown(day: Day): string {
+    const parts: string[] = [];
+    if (day.slotBonus > 0) {
+      parts.push(`+${day.slotBonus} Tagesbonus`);
+    }
+    if (day.caloriePenalty < 0) {
+      parts.push(`−${Math.abs(day.caloriePenalty)} zu viel gegessen`);
+    }
+    return parts.join(', ');
   }
 
   private loadDays(): void {

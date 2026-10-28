@@ -4,7 +4,7 @@ import { ApiService } from '../core/api.service';
 import { localDateTime, today } from '../core/dates';
 import { errorMessage, fieldError } from '../core/messages';
 import { Entry, EntryRequest, EntryType } from '../core/models';
-import { notInFuture } from '../core/validators';
+import { notInFuture, wholeNumber } from '../core/validators';
 
 type Field = 'name' | 'durationMinutes' | 'calories' | 'amountMl' | 'weightKg';
 
@@ -48,9 +48,9 @@ export class EntriesPage implements OnInit {
       validators: [Validators.required, notInFuture],
     }),
     name: new FormControl<string | null>(null, Validators.maxLength(100)),
-    durationMinutes: new FormControl<number | null>(null, [Validators.min(1), Validators.max(1440)]),
-    calories: new FormControl<number | null>(null, [Validators.min(0), Validators.max(5000)]),
-    amountMl: new FormControl<number | null>(null, [Validators.min(1), Validators.max(5000)]),
+    durationMinutes: new FormControl<number | null>(null, [Validators.min(1), Validators.max(1440), wholeNumber]),
+    calories: new FormControl<number | null>(null, [Validators.min(0), Validators.max(5000), wholeNumber]),
+    amountMl: new FormControl<number | null>(null, [Validators.min(1), Validators.max(5000), wholeNumber]),
     weightKg: new FormControl<number | null>(null, [Validators.min(20), Validators.max(400)]),
   });
 
@@ -107,6 +107,9 @@ export class EntriesPage implements OnInit {
   }
 
   protected delete(entry: Entry): void {
+    if (!confirm(`${TYPE_LABELS[entry.type]} von ${entry.timestamp.substring(11, 16)} Uhr löschen?`)) {
+      return;
+    }
     this.api.deleteEntry(entry.id).subscribe({
       next: () => this.loadEntries(),
       error: (error) => this.error.set(errorMessage(error)),

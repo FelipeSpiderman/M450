@@ -64,6 +64,7 @@
             <th>Aktivitäten</th>
             <th>Einträge</th>
             <th>XP</th>
+            <th>Bonus / Abzug</th>
           </tr>
         </thead>
         <tbody>
@@ -75,6 +76,7 @@
               <td>{{ day.activityCount ? day.activityCount + ' (' + day.activityMinutes + ' Min.)' : '–' }}</td>
               <td>{{ day.entries.length }}</td>
               <td class="xp">{{ day.totalXp }}</td>
+              <td class="muted">{{ breakdown(day) || '–' }}</td>
             </tr>
           }
         </tbody>

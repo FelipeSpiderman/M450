@@ -21,6 +21,7 @@ describe('fieldError', () => {
     expect(fieldError(touched('', Validators.required))).toBe('Bitte ausfüllen.');
     expect(fieldError(touched(0, Validators.min(1)))).toBe('Mindestens 1.');
     expect(fieldError(touched(101, Validators.max(100)))).toBe('Höchstens 100.');
+    expect(fieldError(touched(1.5, () => ({ wholeNumber: true })))).toBe('Bitte eine ganze Zahl eingeben.');
   });
 });
 

@@ -134,10 +134,29 @@ describe('EntriesPage', () => {
     expect(page.querySelector('[role="alert"]')?.textContent).toContain('calories is required for MEAL');
   });
 
-  it('deletes an entry', async () => {
+  it('rejects decimals for minutes', async () => {
+    await setValue('#durationMinutes', '30.5');
+    await submit();
+
+    expect(api.createEntry).not.toHaveBeenCalled();
+    expect(page.textContent).toContain('Bitte eine ganze Zahl eingeben.');
+  });
+
+  it('deletes an entry after confirmation', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
     page.querySelector<HTMLButtonElement>('.list button')!.click();
     await fixture.whenStable();
 
     expect(api.deleteEntry).toHaveBeenCalledWith(1);
+  });
+
+  it('keeps the entry when deleting is cancelled', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    page.querySelector<HTMLButtonElement>('.list button')!.click();
+    await fixture.whenStable();
+
+    expect(api.deleteEntry).not.toHaveBeenCalled();
   });
 });

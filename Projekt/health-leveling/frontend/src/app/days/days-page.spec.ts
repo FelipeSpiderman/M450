@@ -54,6 +54,23 @@ describe('DaysPage', () => {
     expect(row.textContent).toContain('155');
   });
 
+  it('explains bonus and penalty of a day', async () => {
+    api.getDays.mockReturnValue(of([{ ...day, slotBonus: 30, caloriePenalty: -20, totalXp: 165 }]));
+    fixture = TestBed.createComponent(DaysPage);
+    page = fixture.nativeElement;
+    await fixture.whenStable();
+
+    expect(page.querySelector('tbody tr')?.textContent).toContain('+30 Tagesbonus, −20 zu viel gegessen');
+  });
+
+  it('rejects decimal steps', async () => {
+    await setValue('#steps', '1000.5');
+    await submit();
+
+    expect(api.saveDay).not.toHaveBeenCalled();
+    expect(page.textContent).toContain('Bitte eine ganze Zahl eingeben.');
+  });
+
   it('needs steps or a sleep score', async () => {
     await submit();
 

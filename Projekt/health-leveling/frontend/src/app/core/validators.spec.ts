@@ -1,6 +1,6 @@
 import { FormControl, FormGroup } from '@angular/forms';
 import { localDateTime, today } from './dates';
-import { atLeastOne, notInFuture } from './validators';
+import { atLeastOne, notInFuture, wholeNumber } from './validators';
 
 describe('notInFuture', () => {
   it('accepts empty values (required is checked separately)', () => {
@@ -33,5 +33,17 @@ describe('atLeastOne', () => {
   it('accepts one filled field, also 0', () => {
     expect(atLeastOne('steps', 'sleepScore')(form(0, null))).toBeNull();
     expect(atLeastOne('steps', 'sleepScore')(form(null, 80))).toBeNull();
+  });
+});
+
+describe('wholeNumber', () => {
+  it('accepts empty values and whole numbers', () => {
+    expect(wholeNumber(new FormControl(null))).toBeNull();
+    expect(wholeNumber(new FormControl(0))).toBeNull();
+    expect(wholeNumber(new FormControl(10000))).toBeNull();
+  });
+
+  it('rejects decimals', () => {
+    expect(wholeNumber(new FormControl(1000.5))).toEqual({ wholeNumber: true });
   });
 });
