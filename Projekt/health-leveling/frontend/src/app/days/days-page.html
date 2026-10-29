@@ -1,0 +1,86 @@
+<h1>Tage</h1>
+
+<section class="card">
+  <h2>Tageswerte erfassen</h2>
+  <p class="muted">Leere Felder bleiben unverändert. So kann z. B. nur der Schlaf nachgetragen werden.</p>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="date">Datum</label>
+      <input id="date" type="date" formControlName="date" />
+      @if (fieldError(form.controls.date); as message) {
+        <p class="field-error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="steps">Schritte</label>
+      <input id="steps" type="number" formControlName="steps" />
+      @if (fieldError(form.controls.steps); as message) {
+        <p class="field-error">{{ message }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="sleepScore">Schlaf-Score (0–100)</label>
+      <input id="sleepScore" type="number" formControlName="sleepScore" />
+      @if (fieldError(form.controls.sleepScore); as message) {
+        <p class="field-error">{{ message }}</p>
+      }
+    </div>
+
+    @if (form.errors?.['atLeastOne'] && form.touched) {
+      <p class="field-error">Bitte Schritte oder Schlaf-Score angeben.</p>
+    }
+
+    <button type="submit">Speichern</button>
+  </form>
+
+  @if (message()) {
+    <p class="message success" role="status">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p class="message error" role="alert">{{ error() }}</p>
+  }
+</section>
+
+<section class="card">
+  <h2>Verlauf</h2>
+  <p class="muted">XP pro Tag in den letzten 14 Tagen</p>
+  <app-xp-chart [days]="days()" />
+</section>
+
+<section class="card">
+  <h2>Übersicht</h2>
+  @if (days().length === 0) {
+    <p class="muted">Noch keine Daten erfasst.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Schritte</th>
+            <th>Schlaf</th>
+            <th>Aktivitäten</th>
+            <th>Einträge</th>
+            <th>XP</th>
+            <th>Bonus / Abzug</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (day of days(); track day.date) {
+            <tr>
+              <td>{{ day.date | date: 'dd.MM.yyyy' }}</td>
+              <td>{{ day.steps ?? '–' }}</td>
+              <td>{{ day.sleepScore ?? '–' }}</td>
+              <td>{{ day.activityCount ? day.activityCount + ' (' + day.activityMinutes + ' Min.)' : '–' }}</td>
+              <td>{{ day.entries.length }}</td>
+              <td class="xp">{{ day.totalXp }}</td>
+              <td class="muted">{{ breakdown(day) || '–' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

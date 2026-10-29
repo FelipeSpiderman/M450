@@ -1,0 +1,43 @@
+<h1>Profil</h1>
+
+@if (error()) {
+  <p class="message error" role="alert">{{ error() }}</p>
+}
+
+@if (profile(); as profile) {
+  <section class="card">
+    <p class="level">Level {{ profile.level }}</p>
+    <div
+      class="progress"
+      role="progressbar"
+      aria-label="Fortschritt bis zum nächsten Level"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-valuenow]="profile.progressPercent"
+    >
+      <div class="progress-bar" [style.width.%]="profile.progressPercent"></div>
+    </div>
+    <p>
+      {{ profile.xpIntoLevel }} / {{ profile.xpForNextLevel }} XP bis Level {{ profile.level + 1 }}
+      <span class="muted">· Total {{ profile.totalXp }} XP</span>
+    </p>
+    <p>
+      Schritte-Serie: <strong>{{ profile.currentStreak }} {{ profile.currentStreak === 1 ? 'Tag' : 'Tage' }}</strong>
+      <!-- the space is inside the span, Angular removes whitespace between elements -->
+      <span class="muted"> in Folge mit 10'000 Schritten</span>
+    </p>
+  </section>
+}
+
+@if (achievements().length > 0) {
+  <h2>Achievements</h2>
+  <ul class="achievements">
+    @for (item of achievements(); track item.achievement) {
+      <li [class.unlocked]="item.unlocked">
+        <strong>{{ item.title }}</strong>
+        <span class="muted">{{ item.description }}</span>
+        <span class="badge">{{ item.unlocked ? 'Freigeschaltet' : 'Gesperrt' }}</span>
+      </li>
+    }
+  </ul>
+}
