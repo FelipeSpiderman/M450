@@ -1,0 +1,14 @@
+{
+  "dataPoints": [
+    {
+      "sleep": {
+        "interval": {
+          "startTime": "2026-10-05T19:30:00Z", "startUtcOffset": "7200s",
+          "endTime": "2026-10-05T23:30:00Z", "endUtcOffset": "7200s"
+        },
+        "metadata": { "mainSleep": true },
+        "summary": { "minutesAsleep": "240" }
+      }
+    }
+  ]
+}
