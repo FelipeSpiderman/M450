@@ -17,13 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -104,5 +107,40 @@ public class RecipeControllerTest {
                 .andExpect(jsonPath("$.description").value("Delicious cake"));
 
         verify(recipeService).addRecipe(any(Recipe.class));
+    }
+
+    @Test
+    void updateRecipe_withValidBody_shouldReturnUpdatedRecipe() throws Exception {
+        when(recipeService.updateRecipe(eq(sampleId), any(Recipe.class))).thenReturn(Optional.of(sampleRecipe));
+
+        mockMvc.perform(put("/api/recipes/{recipeId}", sampleId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sampleRecipe)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(sampleId.toString()))
+                .andExpect(jsonPath("$.name").value("Cake"));
+
+        verify(recipeService).updateRecipe(eq(sampleId), any(Recipe.class));
+    }
+
+    @Test
+    void updateRecipe_withUnknownId_shouldReturnNotFound() throws Exception {
+        when(recipeService.updateRecipe(eq(sampleId), any(Recipe.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/recipes/{recipeId}", sampleId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sampleRecipe)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateRecipe_withBlankName_shouldReturnBadRequest() throws Exception {
+        Recipe invalidRecipe = new Recipe(sampleId, " ", "Description", "http://example.com/cake.jpg", List.of());
+
+        mockMvc.perform(put("/api/recipes/{recipeId}", sampleId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRecipe)))
+                .andExpect(status().isBadRequest());
     }
 }

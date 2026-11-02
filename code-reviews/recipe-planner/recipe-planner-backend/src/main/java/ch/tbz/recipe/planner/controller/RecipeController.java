@@ -40,4 +40,15 @@ public class RecipeController {
     public ResponseEntity<Recipe> addRecipe(@RequestBody Recipe recipe) {
         return new ResponseEntity<>(service.addRecipe(recipe), HttpStatus.OK);
     }
+
+    @PutMapping("/api/recipes/{recipeId}")
+    public ResponseEntity<Recipe> updateRecipe(@PathVariable UUID recipeId, @RequestBody Recipe recipe) {
+        if (recipe.getName() == null || recipe.getName().isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return service.updateRecipe(recipeId, recipe)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
