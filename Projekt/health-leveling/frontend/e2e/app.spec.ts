@@ -13,8 +13,8 @@ const profile = {
 };
 
 const achievements = [
-  { achievement: 'FIRST_ENTRY', title: 'First step', description: 'Log your first entry', unlocked: true },
-  { achievement: 'LEVEL_5', title: 'Rising star', description: 'Reach level 5', unlocked: false },
+  { achievement: 'FIRST_ENTRY', title: 'Erster Schritt', description: 'Erfasse deinen ersten Eintrag', unlocked: true },
+  { achievement: 'LEVEL_5', title: 'Aufsteiger', description: 'Erreiche Level 5', unlocked: false },
 ];
 
 function today(): string {
@@ -58,7 +58,7 @@ test('profile shows level, progress and achievements', async ({ page }) => {
   await expect(page.getByText('Level 2', { exact: true })).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
   await expect(page.getByText('3 Tage')).toBeVisible();
-  await expect(page.getByText('First step')).toBeVisible();
+  await expect(page.getByText('Erster Schritt')).toBeVisible();
 });
 
 test('navigation leads to all pages', async ({ page }) => {

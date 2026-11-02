@@ -48,3 +48,6 @@ Thumbs.db
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Test reports (JUnit XML for the pipeline)
+/reports/

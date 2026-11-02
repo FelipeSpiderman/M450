@@ -14,8 +14,8 @@ describe('ProfilePage', () => {
     currentStreak: 4,
   };
   const achievements = [
-    { achievement: 'FIRST_ENTRY', title: 'First step', description: 'Log your first entry', unlocked: true },
-    { achievement: 'LEVEL_5', title: 'Rising star', description: 'Reach level 5', unlocked: false },
+    { achievement: 'FIRST_ENTRY', title: 'Erster Schritt', description: 'Erfasse deinen ersten Eintrag', unlocked: true },
+    { achievement: 'LEVEL_5', title: 'Aufsteiger', description: 'Erreiche Level 5', unlocked: false },
   ];
 
   async function render(api: Partial<ApiService>): Promise<HTMLElement> {

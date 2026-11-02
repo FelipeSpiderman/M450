@@ -90,12 +90,12 @@ Das ausführliche Testkonzept befindet sich unter [`docs/testkonzept.md`](docs/t
 
 Die GitHub-Actions-Pipeline besteht aus folgenden Stages:
 
-1. **build** – Kompilieren der Applikation
-2. **test** – Ausführen der Unit- und Integration Tests
-3. **report** – Testreports (JUnit-XML) und Code Coverage (JaCoCo) werden als Artefakte in GitHub Actions bereitgestellt
-4. **deploy** – nur beim Merge auf `main`
+1. **build** – Kompilieren von Backend und Frontend
+2. **test** – Unit-, Integration- und E2E-Tests. Die Resultate werden direkt in GitHub angezeigt, die Reports
+   (Surefire, JaCoCo, Playwright, JUnit-XML) als Artefakte bereitgestellt.
+3. **deploy** – nur auf `main`: Die Reports werden auf GitHub Pages veröffentlicht.
 
-Schlagen Tests fehl, wird nicht deployed.
+Schlagen Tests fehl, wird nicht deployed. Details stehen in der [README](README.md#pipeline).
 
 ## Planung
 
@@ -111,11 +111,15 @@ Schlagen Tests fehl, wird nicht deployed.
 
 ## Arbeitsweise
 
-- Jedes Feature wird in einem eigenen Feature-Branch entwickelt und per Merge Request auf `main` gebracht.
+- Jedes Feature wird in einem eigenen Feature-Branch entwickelt (z. B. `feat/backend`, `feat/frontend`) und per
+  Pull Request in den Branch `Project` gebracht. `Project` wird per Pull Request auf `main` gemerged.
 - Commits erfolgen laufend in kleinen, nachvollziehbaren Schritten.
 - Merge Requests werden reviewt und kommentiert, bevor sie gemerged werden.
 
 ## KI-Nutzung
+
+So war die KI-Nutzung zu Beginn geplant. Wie ich die KI tatsächlich genutzt habe, steht in der
+[README](README.md#ki-nutzung).
 
 KI wird für folgendes in diesem Projekt genutzt: 
 
@@ -163,7 +167,7 @@ Voraussetzungen: JDK 21, Node 22, Docker (nur für PostgreSQL).
 
 ## Reflexion
 
-Die Reflexion zu TDD und Code Reviews folgt am Ende des Projekts unter [`docs/reflexion.md`](docs/reflexion.md).
+Die Reflexion zu TDD und Code Reviews steht unter [`docs/reflexion.md`](docs/reflexion.md).
 
 ## Autor
 

@@ -7,31 +7,22 @@ verstehe.
 
 ## Zuerst: Was ist erfüllt und was noch nicht
 
-Stand heute, geprüft am Branch Project.
+Stand 02.11.2026. Was noch zu tun ist, steht ausführlich in [OFFENE-PUNKTE.md](OFFENE-PUNKTE.md).
 
 | Anforderung | Stand | Wo ich es zeige |
 |---|---|---|
-| Teststrategie im README.md des Projekts | erfüllt | Projekt/README.md, Abschnitt Testing |
+| Teststrategie im README.md des Projekts | erfüllt | README.md, Abschnitt Testing, und docs/testkonzept.md |
 | Unit Tests | erfüllt (Backend 116, Frontend 54) | XpCalculatorTest, validators.spec.ts |
 | Integration Tests | erfüllt (12 Tests) | HealthLevelingIntegrationTest, EntryRepositoryTest |
 | Schnittstellen gemockt | erfüllt | SyncServiceTest, GoogleHealthClientTest, E2E-Tests |
-| Testresultate werden reportet | erfüllt (Backend) | JaCoCo- und Surefire-Report, Artefakt in GitHub Actions |
-| Pipeline führt Tests **beim Deploy auf main** aus | **nicht erfüllt** | Pipeline läuft nur auf dem Branch Project, es gibt keine Deploy-Stage, Project ist noch nicht auf main |
-| TDD (optional) | teilweise | in der README beschrieben, in der Git-Historie nicht sichtbar |
-| KI-Nutzung deklariert | vorhanden, **prüfen** | siehe Hinweis unten |
-| Kleine Commits | **schwach** | Backend kam in 2 grossen Commits |
-| Code Reviews (3 PRs pro Person, von einer Person kommentiert) | **nicht erfüllt** | bisher nur PR #5 und #6 im Projekt |
-| Reflexion über TDD und Code Reviews | **fehlt** | noch nicht geschrieben |
+| Testresultate werden reportet | erfüllt | Testübersicht in GitHub Actions, Artefakte, GitHub Pages |
+| Pipeline führt Tests beim Deploy auf main aus | erfüllt, sobald committet, gemerged und Pages eingeschaltet | projekt.yml, GitHub Actions, Pages-Link |
+| TDD (optional) | teilweise | in README und Reflexion beschrieben, in der Git-Historie nicht sichtbar |
+| KI-Nutzung deklariert | Lücken ausfüllen | README.md, Abschnitt KI-Nutzung |
+| Kleine Commits | schwach | Backend kam in 2 grossen Commits, offen ansprechen |
+| Code Reviews durch eine Person | **offen** | Reviewer für den nächsten Pull Request hinzufügen |
+| Reflexion | Lücken ausfüllen | docs/reflexion.md |
 | Scope und Zeit abgeglichen | erfüllt | Tabelle Planung in BESCHREIBUNG.md |
-
-**Vor dem Video erledigen** (Details stehen in OFFENE-PUNKTE.md auf dem Branch Project):
-1. Pipeline so anpassen, dass sie auf main läuft und eine Deploy-Stage hat, die die Reports veröffentlicht.
-   Danach Project per Pull Request auf main bringen. Das ist der wichtigste offene Rubrik-Punkt.
-2. Reflexion schreiben (ein paar Absätze reichen, Fragen siehe Abschnitt 11 unten).
-3. KI-Deklaration prüfen: In der README steht, dass ich Komponenten und HTML selbst geschrieben habe und die KI
-   vor allem Nachschlagewerk, Research und Styling war. In FEHLENDE_TESTS.md steht dagegen, dass Backend und Frontend
-   mit KI geschrieben wurden. Die README muss stimmen, sonst ist der Lernziel-Punkt „transparent deklarieren“ in
-   Gefahr. Lieber ehrlich mehr angeben als zu wenig.
 
 Was ich bis zum Video nicht schaffe, sage ich im Video offen (Abschnitt 11). Das ist besser, als es zu verstecken.
 
@@ -44,7 +35,8 @@ Was ich bis zum Video nicht schaffe, sage ich im Video offen (Abschnitt 11). Das
    das Profil nicht leer ist.
 4. Im Backend einmal den Maven-Befehl „verify“ ausführen. Danach liegen die Reports bereit:
    JaCoCo unter target/site/jacoco/index.html, Surefire unter target/reports. Beide im Browser öffnen.
-5. Auf GitHub diese Tabs offen haben: Actions (ein grüner Lauf der Projekt-Pipeline mit dem Artefakt),
+5. Auf GitHub diese Tabs offen haben: Actions (ein grüner Lauf der Projekt-Pipeline auf main mit Testübersicht,
+   Artefakten und Deploy), die GitHub-Pages-Seite mit den Reports,
    Pull Requests (#5 und #6 und alle neuen), die Commit-Historie.
 6. In VS Code diese Dateien offen haben: Projekt/README.md (in der Markdown-Vorschau, damit die Diagramme sichtbar
    sind), XpCalculatorTest, SyncServiceTest, GoogleHealthClientTest, HealthLevelingIntegrationTest, e2e/app.spec.ts,
@@ -104,10 +96,10 @@ können die XP nie falsch hängen bleiben, wenn ich einen Eintrag lösche oder e
 
 ## 5. Teststrategie (ca. 1 Minute) – Rubrik: Teststrategie im README
 
-**Zeigen:** README.md, Abschnitt Testing, die Testpyramide
+**Zeigen:** README.md, Abschnitt Testing, die Testpyramide, danach kurz docs/testkonzept.md
 
 **Sagen:**
-„Meine Teststrategie steht im README. Ich habe nach der Testpyramide getestet: unten viele schnelle Unit Tests, in
+„Meine Teststrategie steht im README, ausführlicher im Testkonzept nach IEEE 829. Ich habe nach der Testpyramide getestet: unten viele schnelle Unit Tests, in
 der Mitte Integration Tests über HTTP mit einer echten Datenbank, oben wenige E2E-Tests im Browser. Insgesamt sind es
 189 Tests.
 
@@ -177,16 +169,20 @@ Im JaCoCo-Report auf eine Klasse klicken und die grünen und gelben Zeilen zeige
 
 **Zeigen:** .github/workflows/projekt.yml, danach GitHub Actions mit einem grünen Lauf und dem Artefakt
 
-**Sagen (wenn Punkt 1 der Vorbereitung erledigt ist):**
-„Die Pipeline läuft mit GitHub Actions. Sie hat die Stages Build, Test und Deploy. Beim Deploy auf main werden die
-Tests automatisch ausgeführt, und nur wenn alles grün ist, werden die Reports veröffentlicht. Hier ist der Link
-dazu.“
+**Sagen:**
+„Die Pipeline läuft mit GitHub Actions und hat drei Stages. In der Build-Stage werden Backend und Frontend gebaut. In
+der Test-Stage laufen alle Tests: Unit und Integration Tests im Backend, Unit Tests und E2E-Tests im Browser im
+Frontend. Jede Stage startet nur, wenn die vorherige grün ist.
 
-**Sagen (wenn es noch nicht erledigt ist):**
-„Die Pipeline läuft im Moment bei jedem Push auf den Branch Project. Backend und Frontend laufen parallel, und die
-Reports werden als Artefakt hochgeladen, auch wenn ein Test fehlschlägt. Was noch fehlt, ist der Lauf auf main mit
-einer Deploy-Stage. Die E2E-Tests laufen nur lokal, weil dafür in der Pipeline ein Browser installiert werden
-müsste.“
+Die Resultate sieht man direkt hier beim Lauf als Testübersicht. Zusätzlich werden alle Reports als Artefakt
+gespeichert, auch wenn ein Test rot ist. Beim Deploy auf main werden die Reports auf GitHub Pages veröffentlicht, aber
+nur wenn alle Tests grün sind. Hier ist die Seite.“
+
+Die Pages-Seite öffnen und kurz durch die Reports klicken.
+
+Optional erwähnen: „Beim Einrichten der Pipeline habe ich gemerkt, dass der Integrationstest die echte Google API
+aufrufen konnte, wenn auf meinem Rechner das Token gesetzt war. Das habe ich behoben, jetzt ist Google in den Tests
+fest abgeschaltet.“
 
 ## 11. Code Reviews, Commits und Reflexion (ca. 1,5 Minuten)
 
@@ -195,6 +191,8 @@ müsste.“
 **Sagen:**
 „Gearbeitet habe ich mit Feature-Branches für Backend und Frontend, die per Pull Request zusammengeführt wurden.“
 [Hier zeigen, welche Kommentare es in den PRs gab und was ich daraufhin geändert habe.]
+
+**Zeigen:** docs/reflexion.md
 
 **Reflexion, in eigenen Worten beantworten:**
 - Wo hat mir TDD geholfen, wo war es mühsam? (Tipp: Bei der Rechenlogik waren die Regeln klar, da hat es gut

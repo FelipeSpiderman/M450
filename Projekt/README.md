@@ -224,7 +224,9 @@ Die 7 E2E-Tests mit Playwright gehen die wichtigsten Wege durch: Profil anzeigen
 
 ### Coverage und Reports
 
-Bei jedem Build im Backend erstellt JaCoCo einen Coverage-Report und Surefire einen Testreport als HTML.
+Bei jedem Build im Backend erstellt JaCoCo einen Coverage-Report und Surefire einen Testreport als HTML. Im
+Frontend schreiben Vitest und Playwright in der Pipeline zusätzlich JUnit-Dateien, damit GitHub die Resultate
+anzeigen kann. Wo die Reports landen, steht im Abschnitt [Pipeline](#pipeline).
 
 | | Abdeckung |
 |---|---|
@@ -241,25 +243,43 @@ Die Zahl selbst war für mich nicht das Ziel. Ich habe den Report vor allem benu
 
 ## Pipeline
 
-Die Pipeline läuft mit GitHub Actions bei jedem Push und jedem Pull Request auf den Branch Project, aber nur wenn sich etwas im Projektordner geändert hat. Backend und Frontend laufen parallel.
+Die Pipeline läuft mit GitHub Actions (.github/workflows/projekt.yml), wenn sich etwas im Projektordner ändert: bei
+jedem Push auf main, Project und die Feature-Branches und bei jedem Pull Request auf main oder Project. Sie hat drei
+Stages. Jede Stage startet nur, wenn die vorherige grün ist.
 
 ```mermaid
 flowchart LR
-    Push[Push oder Pull Request] --> B & F
+    Push[Push oder Pull Request] --> BB & FB
 
-    subgraph B [Backend]
-        B1[Java 21 einrichten] --> B2[Kompilieren, Tests, Coverage] --> B3[Reports als Artefakt hochladen]
+    subgraph Build
+        BB[Backend kompilieren]
+        FB[Frontend bauen]
     end
 
-    subgraph F [Frontend]
-        F1[Node 22 einrichten] --> F2[Abhängigkeiten installieren] --> F3[Unit Tests] --> F4[Build]
+    subgraph Test
+        BT[Backend: Unit und Integration Tests, Coverage]
+        FT[Frontend: Unit Tests, E2E-Tests im Browser]
     end
 
-    B2 -->|Test rot| X[Pipeline schlägt fehl]
-    F3 -->|Test rot| X
+    BB --> BT
+    FB --> FT
+
+    BT & FT -->|alle grün und Branch main| D[Deploy: Reports auf GitHub Pages]
+    BT -->|Test rot| X[Pipeline schlägt fehl, kein Deploy]
+    FT -->|Test rot| X
 ```
 
-Die Reports des Backends werden auch dann hochgeladen, wenn ein Test fehlschlägt. So sieht man direkt in GitHub, welcher Test kaputt ist. Die E2E-Tests laufen im Moment nur lokal, weil dafür in der Pipeline zuerst ein Browser mit allen Systembibliotheken installiert werden müsste.
+So werden die Testresultate reportet:
+
+- **Direkt in GitHub:** Die Ergebnisse aller Tests (Backend, Vitest und Playwright) erscheinen als Testübersicht beim
+  Lauf. Dort sieht man sofort, welcher Test fehlgeschlagen ist.
+- **Als Artefakt:** Surefire-Report, JaCoCo-Coverage, Playwright-Report und die JUnit-Dateien des Frontends können bei
+  jedem Lauf heruntergeladen werden, auch wenn ein Test rot ist.
+- **Auf GitHub Pages:** Bei einem Push auf main werden die Reports veröffentlicht, aber nur wenn alle Tests grün sind.
+  Das ist die Deploy-Stage.
+
+Die E2E-Tests laufen in der Pipeline in einem echten Chromium. Der Browser wird dafür in der Pipeline samt
+Systembibliotheken installiert.
 
 ## Applikation starten
 
@@ -273,14 +293,39 @@ Wie man die Tests einzeln startet und wo die Reports liegen, steht im [Backend-R
 
 ## KI-Nutzung
 
-Im Projekt ist KI erlaubt, wenn sie deklariert wird. Ich habe sie für folgendes verwendet:
+Im Projekt ist KI erlaubt, wenn sie deklariert wird. Ich habe Claude Code (KI-Agent) verwendet. Die Vorgabe des
+Moduls unterscheidet vier Rollen. So habe ich sie genutzt:
 
-- **Als Nachschlagewerk und bei Fehlern:** Wenn ich nicht weiterkam, habe ich gefragt, woran es liegt, und versucht zu verstehen, warum.
-- **Research:** Welche Libraries und Tools sich für das Projekt eignen und wie man sie einsetzt.
-- **Google Health API:** Ich habe die API zum ersten Mal benutzt. Für die Anmeldung über OAuth und das Format der Anfragen habe ich mir von der KI helfen lassen.
-- **Styling im Frontend:** Komponenten und HTML habe ich selbst geschrieben, das Styling hat grösstenteils die KI gemacht.
-- **Kontrolle der Pull Requests:** Vor dem Mergen habe ich Claude Code über meine Änderungen schauen lassen. Die eigentlichen Code Reviews macht aber eine Person.
-- **Grammatik Korrektur:** Dieses Readme habe ich geschrieben doch dazu wurde mithilfe von KI die Grammatik und Logik verbessert.
+| Rolle | Genutzt | Wofür |
+|---|---|---|
+| Nachschlagewerk | ja | Fehlermeldungen verstehen, Fragen zu Spring Boot, Angular, Mockito und Playwright, Wahl der Libraries |
+| Schreiben mit Autocomplete | [ergänzen: ja/nein] | [ergänzen] |
+| Code durch einen Agenten erstellen lassen | ja | grosse Teile von Backend, Frontend und Tests |
+| Reviewen und Optimieren | ja | Kontrolle der Pull Requests vor dem Merge, Grammatik dieser README |
+
+### Was von mir kommt
+
+- Die Projektidee, die Planung und der Umfang.
+- Die Spielregeln: wie viele XP es wofür gibt, die Levelgrenzen, Streaks und Achievements.
+- Die Anforderungen an die Tests: welche Grenzwerte und Fehlerfälle geprüft werden müssen.
+- Das Testen gegen die echte Google Health API und gegen PostgreSQL von Hand.
+- [ergänzen: Teile im Backend oder Frontend, die ich selbst geschrieben habe]
+
+### Wobei die KI geholfen hat
+
+- **Backend und Frontend:** Der Code ist zusammen mit Claude Code entstanden. Ich habe beschrieben, was gebaut werden
+  soll, den Code gelesen, ausprobiert und angepasst. Wo ich nicht weiterkam, hat die KI Lösungen vorgeschlagen.
+  [ergänzen: wie viel davon ich selbst geschrieben habe]
+- **Tests:** Die Testfälle und Grenzwerte habe ich vorgegeben. [ergänzen: welche Tests ich selbst geschrieben habe und
+  wo die KI geholfen hat]
+- **Google Health API:** Ich habe die API zum ersten Mal benutzt. Bei OAuth und beim Format der Anfragen hat mir die KI
+  geholfen.
+- **Styling im Frontend:** grösstenteils von der KI.
+- **Pull Requests:** Vor dem Merge habe ich Claude Code über die Änderungen schauen lassen. Die eigentlichen Code
+  Reviews macht eine Person.
+
+Weil grosse Teile mit KI entstanden sind, habe ich darauf geachtet, dass ich den Code und vor allem die Tests erklären
+kann.
 
 ## Weitere Dokumente
 
@@ -291,6 +336,8 @@ Im Projekt ist KI erlaubt, wenn sie deklariert wird. Ich habe sie für folgendes
 | [Frontend-README](health-leveling/frontend/README.md) | Seiten, Aufbau, Validierungsregeln |
 | [IMPORT_FORMAT.md](IMPORT_FORMAT.md) | Aufbau der Google-Exportdateien |
 | [ENDPOINTS.md](ENDPOINTS.md) | Endpunkte der Google Health API |
+| [docs/testkonzept.md](docs/testkonzept.md) | Testkonzept nach der Vorlage IEEE 829 |
+| [docs/reflexion.md](docs/reflexion.md) | Reflexion über TDD, Code Reviews und das Projekt |
 | [OFFENE-PUNKTE.md](OFFENE-PUNKTE.md) | Was bis zur Abgabe noch fehlt |
 
 ## Autor

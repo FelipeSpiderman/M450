@@ -10,6 +10,13 @@ Stand der Prüfung (Oktober 2026):
 | Frontend Unit | `feat/frontend` (777e2a8) | 9 Spec-Dateien, 48 Tests (Vitest) | alle grün |
 | Frontend E2E | `feat/frontend` (777e2a8) | 7 Tests (Playwright) | alle grün |
 
+## Stand 02.11.2026
+
+Die Punkte 1 bis 5 und 7 sind behoben (Google im Integrationstest abgeschaltet, E2E-Tests und Frontend-Reports in der
+Pipeline, Stages Build, Test und Deploy auf main, Testkonzept unter `docs/testkonzept.md`). Punkt 6 ist in der
+Reflexion beschrieben, die Red-Green-Schritte lassen sich in der Historie nicht mehr nachträglich zeigen. Punkt 8 bleibt
+optional. Die Achievements sind jetzt auf Deutsch. Was noch offen ist, steht in [OFFENE-PUNKTE.md](OFFENE-PUNKTE.md).
+
 ## Kurzfazit
 
 Die Testfälle, die in der Teststrategie verlangt werden, sind vorhanden. Die Lücken liegen nicht bei fehlenden Testfällen, sondern bei der **Testumgebung** (Isolation, Pipeline) und beim **Nachweis bzw. der Dokumentation**.

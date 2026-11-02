@@ -8,7 +8,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
-  reporter: 'html',
+  // In the pipeline an additional JUnit report is written, so the results can be shown in GitHub
+  reporter: process.env['CI']
+    ? [['list'], ['html', { open: 'never' }], ['junit', { outputFile: 'reports/playwright-junit.xml' }]]
+    : 'html',
   use: {
     baseURL: `http://localhost:${port}`,
     trace: 'on-first-retry',

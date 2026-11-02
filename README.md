@@ -58,3 +58,17 @@ java -cp "classes:./lib/gson/*:./lib/okhttp/*" Main
 cd Unit-Testing/calculator && ./mvnw test
 cd Unit-Testing/02_bank-vorgabe && ./mvnw test
 ```
+
+---
+
+### Projekt: Health Leveling
+
+| Thema | Datei | Inhalt |
+|-------|-------|--------|
+| Projekt-README | `Projekt/README.md` | Applikation, Teststrategie, Pipeline, KI-Nutzung |
+| Testkonzept | `Projekt/docs/testkonzept.md` | Testkonzept nach IEEE 829 |
+| Reflexion | `Projekt/docs/reflexion.md` | TDD, Code Reviews, Commits, Fazit |
+| Code | `Projekt/health-leveling/` | Backend (Spring Boot) und Frontend (Angular) |
+| Pipeline | `.github/workflows/projekt.yml` | Build, Test und Deploy der Reports auf GitHub Pages |
+
+Details zum Starten und Testen stehen in der [Projekt-README](Projekt/README.md).

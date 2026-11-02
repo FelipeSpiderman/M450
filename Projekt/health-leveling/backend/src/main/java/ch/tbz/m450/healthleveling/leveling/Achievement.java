@@ -1,12 +1,12 @@
 package ch.tbz.m450.healthleveling.leveling;
 
 public enum Achievement {
-    FIRST_ENTRY("First step", "Log your first entry"),
-    STEP_GOAL("10k club", "Reach 10'000 steps in one day"),
-    GOOD_SLEEP("Sleeping beauty", "Get a sleep score of 90 or more"),
-    FULL_DAY("All day long", "Log entries in the morning, at midday and in the evening"),
-    WEEK_STREAK("On fire", "Reach the step goal 7 days in a row"),
-    LEVEL_5("Rising star", "Reach level 5");
+    FIRST_ENTRY("Erster Schritt", "Erfasse deinen ersten Eintrag"),
+    STEP_GOAL("10k-Club", "Erreiche 10'000 Schritte an einem Tag"),
+    GOOD_SLEEP("Dornröschen", "Erreiche einen Schlaf-Score von 90 oder mehr"),
+    FULL_DAY("Den ganzen Tag", "Erfasse Einträge am Morgen, am Mittag und am Abend"),
+    WEEK_STREAK("Feuer und Flamme", "Erreiche das Schrittziel 7 Tage in Folge"),
+    LEVEL_5("Aufsteiger", "Erreiche Level 5");
 
     private final String title;
     private final String description;

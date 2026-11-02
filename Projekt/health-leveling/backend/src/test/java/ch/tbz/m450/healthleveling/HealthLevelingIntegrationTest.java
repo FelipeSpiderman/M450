@@ -24,8 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Tests the whole application over HTTP: controller, service and H2 database together.
  * Every test is rolled back afterwards, so each one starts with an empty database.
+ * Google credentials and the scheduled sync are switched off, so no test can reach the real API
+ * even if GOOGLE_REFRESH_TOKEN is set on the machine.
  */
-@SpringBootTest
+@SpringBootTest(properties = {"google.health.refresh-token=", "google.health.sync-cron=-"})
 @AutoConfigureMockMvc
 @Transactional
 class HealthLevelingIntegrationTest {
