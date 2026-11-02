@@ -13,7 +13,6 @@
 class MyFancyClass
 {
     public function shortString($text, $length, $ending = '...') {
-        // the ending has to fit into the requested length
         if (mb_strlen($ending) > $length) {
             return false;
         }
@@ -29,7 +28,6 @@ class MyFancyClass
         }
         $sum = 0;
         foreach ($values as $value) {
-            // numeric strings like '4.5' are allowed, words like 'bestanden' are not
             if (!is_numeric($value)) {
                 return false;
             }
@@ -39,7 +37,6 @@ class MyFancyClass
     }
 
     public function getOpposite($value, $delimiter = ',') {
-        // array -> string and string -> array, so getOpposite(getOpposite($x)) === $x
         if (is_array($value)) {
             return implode($delimiter, $value);
         }
