@@ -1,0 +1,108 @@
+<h1>Erfassen</h1>
+
+<section class="card">
+  <h2>Neuer Eintrag</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label for="type">Art</label>
+      <select id="type" formControlName="type">
+        @for (type of types; track type) {
+          <option [value]="type">{{ typeLabels[type] }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="timestamp">Zeitpunkt</label>
+      <input id="timestamp" type="datetime-local" formControlName="timestamp" />
+      @if (fieldError(form.controls.timestamp); as message) {
+        <p class="field-error">{{ message }}</p>
+      }
+    </div>
+
+    @if (shows('name')) {
+      <div class="field">
+        <label for="name">
+          {{ form.controls.type.value === 'ACTIVITY' ? 'Bezeichnung (z. B. Laufen)' : 'Bezeichnung (optional)' }}
+        </label>
+        <input id="name" type="text" formControlName="name" />
+        @if (fieldError(form.controls.name); as message) {
+          <p class="field-error">{{ message }}</p>
+        }
+      </div>
+    }
+
+    @if (shows('durationMinutes')) {
+      <div class="field">
+        <label for="durationMinutes">Dauer in Minuten</label>
+        <input id="durationMinutes" type="number" formControlName="durationMinutes" />
+        @if (fieldError(form.controls.durationMinutes); as message) {
+          <p class="field-error">{{ message }}</p>
+        }
+      </div>
+    }
+
+    @if (shows('calories')) {
+      <div class="field">
+        <label for="calories">
+          {{ form.controls.type.value === 'ACTIVITY' ? 'Verbrannte Kalorien (optional)' : 'Kalorien' }}
+        </label>
+        <input id="calories" type="number" formControlName="calories" />
+        @if (fieldError(form.controls.calories); as message) {
+          <p class="field-error">{{ message }}</p>
+        }
+      </div>
+    }
+
+    @if (shows('amountMl')) {
+      <div class="field">
+        <label for="amountMl">Menge in ml</label>
+        <input id="amountMl" type="number" formControlName="amountMl" />
+        @if (fieldError(form.controls.amountMl); as message) {
+          <p class="field-error">{{ message }}</p>
+        }
+      </div>
+    }
+
+    @if (shows('weightKg')) {
+      <div class="field">
+        <label for="weightKg">Gewicht in kg</label>
+        <input id="weightKg" type="number" step="0.1" formControlName="weightKg" />
+        @if (fieldError(form.controls.weightKg); as message) {
+          <p class="field-error">{{ message }}</p>
+        }
+      </div>
+    }
+
+    <button type="submit">Speichern</button>
+  </form>
+
+  @if (message()) {
+    <p class="message success" role="status">{{ message() }}</p>
+  }
+  @if (error()) {
+    <p class="message error" role="alert">{{ error() }}</p>
+  }
+</section>
+
+<section class="card">
+  <div class="row">
+    <h2>Einträge</h2>
+    <input type="date" aria-label="Tag" [value]="date()" (change)="changeDate($event)" />
+  </div>
+
+  @if (entries().length === 0) {
+    <p class="muted">Keine Einträge an diesem Tag.</p>
+  } @else {
+    <ul class="list">
+      @for (entry of entries(); track entry.id) {
+        <li>
+          <span class="muted">{{ entry.timestamp.substring(11, 16) }}</span>
+          <span><strong>{{ typeLabels[entry.type] }}</strong> {{ describe(entry) }}</span>
+          <span class="xp">+{{ entry.xp }} XP</span>
+          <button type="button" class="secondary" (click)="delete(entry)">Löschen</button>
+        </li>
+      }
+    </ul>
+  }
+</section>

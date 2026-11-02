@@ -1,0 +1,33 @@
+<h1>Import</h1>
+
+@if (message()) {
+  <p class="message success" role="status">{{ message() }}</p>
+}
+@if (error()) {
+  <p class="message error" role="alert">{{ error() }}</p>
+}
+
+<section class="card">
+  <h2>Datei importieren</h2>
+  <p class="muted">
+    CSV oder JSON aus dem Google-Export. Bereits vorhandene Tage werden aktualisiert, nicht doppelt angelegt.
+  </p>
+  <div class="field">
+    <label for="file">Datei (.csv oder .json)</label>
+    <input id="file" type="file" accept=".csv,.json" (change)="selectFile($event)" />
+  </div>
+  <button type="button" [disabled]="!file() || busy()" (click)="importFile()">Importieren</button>
+
+  <details>
+    <summary>Erwartetes Format</summary>
+    <pre>date,steps,sleep_score,activity_count,activity_minutes
+2026-10-06,8412,72,1,69
+2026-10-07,2103,,0,0</pre>
+  </details>
+</section>
+
+<section class="card">
+  <h2>Google Health</h2>
+  <p class="muted">Holt Schritte, Schlaf und Trainings der letzten 7 Tage direkt von Google.</p>
+  <button type="button" [disabled]="busy()" (click)="sync()">Jetzt synchronisieren</button>
+</section>

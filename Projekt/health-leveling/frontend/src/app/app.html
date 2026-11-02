@@ -1,0 +1,13 @@
+<header class="header">
+  <span class="logo">Health Leveling</span>
+  <nav>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Profil</a>
+    <a routerLink="/erfassen" routerLinkActive="active">Erfassen</a>
+    <a routerLink="/tage" routerLinkActive="active">Tage</a>
+    <a routerLink="/import" routerLinkActive="active">Import</a>
+  </nav>
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>

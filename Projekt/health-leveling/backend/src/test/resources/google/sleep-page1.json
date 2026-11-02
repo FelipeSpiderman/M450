@@ -1,0 +1,27 @@
+{
+  "dataPoints": [
+    {
+      "sleep": {
+        "interval": {
+          "startTime": "2026-10-05T20:30:00Z", "startUtcOffset": "7200s",
+          "endTime": "2026-10-06T04:30:00Z", "endUtcOffset": "7200s"
+        },
+        "type": "STAGES",
+        "metadata": { "mainSleep": true },
+        "summary": { "minutesAsleep": "432", "minutesAwake": "48" }
+      }
+    },
+    {
+      "sleep": {
+        "interval": {
+          "startTime": "2026-10-06T12:00:00Z", "startUtcOffset": "7200s",
+          "endTime": "2026-10-06T12:30:00Z", "endUtcOffset": "7200s"
+        },
+        "type": "CLASSIC",
+        "metadata": { "mainSleep": false },
+        "summary": { "minutesAsleep": "30" }
+      }
+    }
+  ],
+  "nextPageToken": "page-2"
+}
